@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,6 +11,10 @@ namespace LuminateDiscordBot
     internal class Utils
     {
         public static Objects.Config Config;
+
+        public static string DefaultSloganText = "Your ideas shine bright";
+
+        public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
 
         public static void FileCheck()
         {
@@ -26,6 +31,11 @@ namespace LuminateDiscordBot
         {
             Directory.CreateDirectory("LuminateConfig");
             using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
+        }
+
+        static void WriteConfig()
+        {
+            using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(Config), new JsonSerializerOptions() { WriteIndented = true }); }
         }
     }
 }

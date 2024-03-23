@@ -14,13 +14,32 @@ namespace LuminateDiscordBot
         public static void InitDB()
         {
             SQLiteConnection.CreateFile(connectionString);
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS WelcomeConfig(WelcomeChannelId BIGINT DEFAULT 0, WelcomeMessage TEXT)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketConfig(TicketCategoryId BIGING DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketKeywords TEXT DEFAULT [])");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT)");
+            
         }
 
 
+        public static void ModifyChannelConfig(string identifier, ulong channelId)
+        {
+            using (SQLiteConnection connection = new(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = new(connection))
+                {
+                    command.CommandText = $"INSERT INTO ChannelConfig (ChannelIdentifier, ChannelId) VALUES (@identifier, @channel) ON DUPLICATE KEY UPDATE ChannelIdentifier=@identifier";
+                    command.Parameters.AddWithValue("@identifier", identifier);
+                    command.Parameters.AddWithValue("@channel", channelId);
+                    command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+        }
 
 
 

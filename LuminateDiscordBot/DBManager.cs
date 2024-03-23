@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,45 @@ namespace LuminateDiscordBot
             
         }
 
+        public static void UpdateInternalChannelConfigs()
+        {
+            Utils.ChannelConfig.Clear();
+            using (SQLiteConnection connection = new(connectionString))
+            {
+                connection.Open();
 
+                using (SQLiteCommand command = new(connection))
+                {
+                    command.CommandText = "SELECT * FROM ChannelConfig";
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Utils.ChannelConfig.Add(Convert.ToString(reader["ChannelIdentifier"]), Convert.ToUInt64(reader["ChannelId"]));
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+
+        public static int RemoveChannelConfigRule(string identifier)
+        {
+            int affected = 0;
+            using (SQLiteConnection connection = new(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = new(connection))
+                {
+                    command.CommandText = "DELETE FROM ChannelConfig WHERE ChannelIdentifier=@identifier";
+                    command.Parameters.AddWithValue("@identifier", identifier);
+                    affected = command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+            return affected;
+        }
         public static void ModifyChannelConfig(string identifier, ulong channelId)
         {
             using (SQLiteConnection connection = new(connectionString))
@@ -40,6 +79,7 @@ namespace LuminateDiscordBot
                 connection.Close();
             }
         }
+
 
 
 

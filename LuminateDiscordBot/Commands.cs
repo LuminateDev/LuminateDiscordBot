@@ -57,7 +57,7 @@ namespace LuminateDiscordBot
                 return;
             } else
             {
-                await Context.Channel.SendMessageAsync("");
+                await Context.Channel.SendMessageAsync(message);
                 return;
             }
 

@@ -39,6 +39,7 @@ namespace LuminateDiscordBot
             // Events
 
             client.Ready += OnReady;
+            client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
 
             // Events end here
 

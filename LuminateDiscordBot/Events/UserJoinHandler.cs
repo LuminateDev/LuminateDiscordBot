@@ -22,7 +22,11 @@ namespace LuminateDiscordBot.Events
             {
                 Text = $"Luminate - {Utils.DefaultSloganText}"
             };
-            await Program.client.GetGuild(user.Id).GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
+            try
+            {
+                await user.Guild.GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
+            }catch(Exception e) { await Console.Out.WriteLineAsync(e.Message); }
+            
         }
     }
 }

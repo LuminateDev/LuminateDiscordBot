@@ -14,7 +14,7 @@ namespace LuminateDiscordBot
 
         public static void InitDB()
         {
-            SQLiteConnection.CreateFile(connectionString);
+            SQLiteConnection.CreateFile("LuminateConfig/database.db");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketConfig(TicketCategoryId BIGING DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
@@ -64,20 +64,26 @@ namespace LuminateDiscordBot
         }
         public static void ModifyChannelConfig(string identifier, ulong channelId)
         {
-            using (SQLiteConnection connection = new(connectionString))
+            try
             {
-                connection.Open();
-
-                using (SQLiteCommand command = new(connection))
+                using (SQLiteConnection connection = new(connectionString))
                 {
-                    command.CommandText = $"INSERT INTO ChannelConfig (ChannelIdentifier, ChannelId) VALUES (@identifier, @channel) ON DUPLICATE KEY UPDATE ChannelIdentifier=@identifier";
-                    command.Parameters.AddWithValue("@identifier", identifier);
-                    command.Parameters.AddWithValue("@channel", channelId);
-                    command.ExecuteNonQuery();
-                }
+                    connection.Open();
 
-                connection.Close();
+                    using (SQLiteCommand command = new(connection))
+                    {
+                        command.CommandText = $"INSERT OR REPLACE INTO ChannelConfig (ChannelIdentifier, ChannelId) VALUES (@identifier, @channel)"; ;
+                        command.Parameters.AddWithValue("@identifier", identifier);
+                        command.Parameters.AddWithValue("@channel", channelId);
+                        command.ExecuteNonQuery();
+                    }
+
+                    connection.Close();
+                }
+                UpdateInternalChannelConfigs();
             }
+            catch(Exception e) { Console.WriteLine(e.Message); }
+
         }
 
 

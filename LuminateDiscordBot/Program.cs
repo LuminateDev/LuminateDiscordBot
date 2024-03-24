@@ -19,12 +19,13 @@ namespace LuminateDiscordBot
             Utils.FileCheck();
             Utils.ReadFiles();
             DBManager.InitDB();
+            DBManager.UpdateInternalChannelConfigs();
             if(Utils.Config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
 
             DiscordSocketConfig socketConfig = new DiscordSocketConfig()
             {
                 GatewayIntents = Discord.GatewayIntents.All,
-                LogLevel = Discord.LogSeverity.Error,
+                LogLevel = Discord.LogSeverity.Info,
                 UseInteractionSnowflakeDate = false,
                 AlwaysDownloadUsers = true,
             };
@@ -40,17 +41,30 @@ namespace LuminateDiscordBot
 
             client.Ready += OnReady;
             client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
+            client.UserJoined += Events.UserJoinHandler.HandleUserServerJoin;
+            //client.Log += OnLog;
 
             // Events end here
+
+            Console.WriteLine("Setup Complete");
 
             await Task.Delay(-1);
 
 
             async Task OnReady()
             {
-                await _interactionService.RegisterCommandsGloballyAsync(true);
-                await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
-                Console.WriteLine("Bot Online!");
+                try
+                {
+                    await _interactionService.RegisterCommandsGloballyAsync(true);
+                    await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
+                    Console.WriteLine("Bot Online!");
+                }catch(Exception e) { Console.WriteLine(e.Message); }
+
+            }
+
+            async Task OnLog(LogMessage msg)
+            {
+                Console.WriteLine(msg.Message);
             }
         }
 

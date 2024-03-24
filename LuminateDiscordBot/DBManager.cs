@@ -14,7 +14,8 @@ namespace LuminateDiscordBot
 
         public static void InitDB()
         {
-            SQLiteConnection.CreateFile("LuminateConfig/database.db");
+            
+            if(!File.Exists("LuminateConfig/database.db")) { SQLiteConnection.CreateFile("LuminateConfig/database.db"); }
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketConfig(TicketCategoryId BIGING DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");

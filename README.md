@@ -4,7 +4,7 @@ We have decided to open source this project as we find it to be an appropriate s
 If you wish to contribute to this project please stick to the Luminate Contribution Conventions!
 
 Build info:
-<b>Dev Branch</b>
-![Dev Branch](https://github.com/LuminateDev/LuminateDiscordBot/actions/workflows/dotnet.yml/badge.svg?branch=dev)
-<b>Release Branch</b>
+<b>Dev Branch</b><br>
+![Dev Branch](https://github.com/LuminateDev/LuminateDiscordBot/actions/workflows/dotnet.yml/badge.svg?branch=dev)<br>
+<b>Release Branch</b><br>
 ![Release Branch](https://github.com/LuminateDev/LuminateDiscordBot/actions/workflows/dotnet.yml/badge.svg?branch=master)

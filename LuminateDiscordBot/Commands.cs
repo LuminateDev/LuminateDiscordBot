@@ -96,8 +96,12 @@ namespace LuminateDiscordBot
             }
             else
             {
-                await Context.Channel.SendMessageAsync(message);
-                return;
+                try
+                {
+                    await Context.Channel.SendMessageAsync(message);
+                    return;
+                }catch(Exception e) { Console.WriteLine(e); }
+
             }
         }
     }

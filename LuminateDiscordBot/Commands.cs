@@ -67,7 +67,10 @@ namespace LuminateDiscordBot
         [SlashCommand("mod-addticketalias", "Adds an alias to Ticket Categories")]
         [RequireUserPermission(GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
-        public async Task AddTicketAlias()
+        public async Task AddTicketAlias([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string category, string alias)
+        {
+
+        }
 
         [SlashCommand("mod-echoattachment", "Repeats a message from file content")]
         [RequireUserPermission(GuildPermission.Administrator)]

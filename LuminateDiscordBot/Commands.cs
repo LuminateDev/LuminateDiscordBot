@@ -15,7 +15,7 @@ namespace LuminateDiscordBot
         [SlashCommand("mod-setchannelrule", "Adds or updates the channel config")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
-        public async Task ModifyChannelRules([Summary("channel_identifier", "The internal Identifier you modify")] string channelIdentifier, [ChannelTypes(Discord.ChannelType.Text, Discord.ChannelType.Voice)] IChannel targetChannel)
+        public async Task ModifyChannelRules([Summary("channel_identifier", "The internal Identifier you modify")] string channelIdentifier, [ChannelTypes(Discord.ChannelType.Text, Discord.ChannelType.Voice, Discord.ChannelType.Category)] IChannel targetChannel)
         {
             DBManager.ModifyChannelConfig(channelIdentifier, targetChannel.Id);
             EmbedBuilder embed = new EmbedBuilder();

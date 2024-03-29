@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SQLite;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -16,12 +17,71 @@ namespace LuminateDiscordBot
         {
             
             if(!File.Exists("LuminateConfig/database.db")) { SQLiteConnection.CreateFile("LuminateConfig/database.db"); }
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketConfig(TicketCategoryId BIGING DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketKeywords TEXT DEFAULT [])");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT)");
             
+        }
+
+        public static List<Objects.TicketCategory> GetTicketCategories()
+        {
+            List<Objects.TicketCategory> cats = new List<Objects.TicketCategory>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "SELECT * FROM TicketCategories";
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        cats.Add(new((string)reader["TicketTopic"], (string)reader["Keywords"]));
+                    }
+                }
+
+               connection.Close();
+            }
+
+            return cats;
+        }
+
+        public static Objects.TicketCategory GetTicketCategoryFromName(string ticketTopic)
+        {
+            Objects.TicketCategory ticketCat = null;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "SELECT * FROM TicketCategories WHERE TicketTopic=@topic";
+                    command.Parameters.AddWithValue("@topic", ticketTopic);
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        ticketCat = new((string)reader["TicketTopic"], (string)reader["TicketKeywords"])
+                    }
+                }
+            }
+        }
+
+        public static Task<int> AddTicketAlias(string ticketTopic, string ticketAlias)
+        {
+
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE TicketCategories SET Keywords=@alias WHERE TicketTopic=@topic";
+                    command.Parameters.AddWithValue("@alias", )
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public static void UpdateInternalChannelConfigs()

@@ -4,7 +4,9 @@ using System.Configuration;
 using System.Data.SQLite;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Permissions;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
@@ -61,16 +63,20 @@ namespace LuminateDiscordBot
                     SQLiteDataReader reader = command.ExecuteReader();
                     while(reader.Read())
                     {
-                        ticketCat = new((string)reader["TicketTopic"], (string)reader["TicketKeywords"])
+                        ticketCat = new((string)reader["TicketTopic"], (string)reader["TicketKeywords"]);
                     }
                 }
+                connection.Close();
             }
+            return ticketCat;
         }
 
         public static Task<int> AddTicketAlias(string ticketTopic, string ticketAlias)
         {
-
-
+            int affected = 0;
+            Objects.TicketCategory TargetTicketCategorie = GetTicketCategoryFromName(ticketTopic);
+            if(TargetTicketCategorie == null) { return Task.FromResult(affected); }
+            TargetTicketCategorie.CategoryAliasList.Add(ticketAlias);
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -78,10 +84,14 @@ namespace LuminateDiscordBot
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
                     command.CommandText = "UPDATE TicketCategories SET Keywords=@alias WHERE TicketTopic=@topic";
-                    command.Parameters.AddWithValue("@alias", )
-                    command.ExecuteNonQuery();
+                    command.Parameters.AddWithValue("@alias", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(TargetTicketCategorie.CategoryAliasList))));
+                    command.Parameters.AddWithValue("@topic", ticketTopic);
+                    affected = command.ExecuteNonQuery();
                 }
+                connection.Close();
+                
             }
+            return Task.FromResult(affected);
         }
 
         public static void UpdateInternalChannelConfigs()

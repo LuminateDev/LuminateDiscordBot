@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ namespace LuminateDiscordBot
         public static string DefaultSloganText = "Your ideas shine bright";
 
         public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
-
+        
         public static void FileCheck()
         {
             if(!Directory.Exists("LuminateConfig")) { CreateFiles(); }
@@ -37,5 +38,6 @@ namespace LuminateDiscordBot
         {
             using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(Config), new JsonSerializerOptions() { WriteIndented = true }); }
         }
+
     }
 }

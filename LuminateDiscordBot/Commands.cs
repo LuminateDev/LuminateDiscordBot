@@ -7,6 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Discord.Rest;
+using Discord.WebSocket;
 
 namespace LuminateDiscordBot
 {
@@ -99,6 +101,15 @@ namespace LuminateDiscordBot
                 await Context.Channel.SendMessageAsync(message);
                 return;
             }
+        }
+
+        [SlashCommand("mod-setprivatevcchannel", "Sets the channel for users to create a private vc")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [CommandContextType(InteractionContextType.Guild)]
+        public async Task SetPrivateVoiceChannelChannel([ChannelTypes(Discord.ChannelType.Text)] IChannel infoChannel ,[ChannelTypes(Discord.ChannelType.Voice)] IChannel targetVoiceChannel, [ChannelTypes(Discord.ChannelType.Text)] IChannel targetInfoChannel)
+        {
+            ulong guild_id = Context.Interaction.GuildId.Value;
+            DBManager.ModifyVoiceChannelConfig(infoChannel.Id ,targetVoiceChannel.Id, guild_id);
         }
     }
 }

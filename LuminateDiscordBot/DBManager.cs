@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SQLite;
@@ -34,15 +35,7 @@ namespace LuminateDiscordBot
             {
                 connection.Open();
 
-                using (SQLiteCommand command = new SQLiteCommand(connection))
-                {
-                    command.CommandText = "SELECT * FROM TicketCategories";
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        cats.Add(new((string)reader["TicketTopic"], (string)reader["Keywords"]));
-                    }
-                }
+                cats = connection.Query<Objects.TicketCategory>("SELECT * FROM TicketCategories").AsList();
 
                connection.Close();
             }
@@ -56,16 +49,9 @@ namespace LuminateDiscordBot
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(connection))
-                {
-                    command.CommandText = "SELECT * FROM TicketCategories WHERE TicketTopic=@topic";
-                    command.Parameters.AddWithValue("@topic", ticketTopic);
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while(reader.Read())
-                    {
-                        ticketCat = new((string)reader["TicketTopic"], (string)reader["TicketKeywords"]);
-                    }
-                }
+
+                ticketCat = connection.Query<Objects.TicketCategory>($"SELECT * FROM TicketCategories WHERE TicketDataName={ticketTopic}").FirstOrDefault();
+
                 connection.Close();
             }
             return ticketCat;

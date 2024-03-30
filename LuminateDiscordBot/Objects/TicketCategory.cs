@@ -11,13 +11,14 @@ namespace LuminateDiscordBot.Objects
     public class TicketCategory
     {
         public string CategoryName { get; set; }
-        public List<string> CategoryAliasList { get; set; }
+        public string CategoryAliasList { get; set; }
+        public string TicketDataName { get; set; }
+        public string TicketDataDescription { get; set; }
+        public string TicketDataAutoResponse { get; set; }
 
-
-        public TicketCategory(string Catname, string aliasB64)
+        public List<string> GetCategoryAliases()
         {
-            this.CategoryName = Catname;
-            this.CategoryAliasList = JsonSerializer.Deserialize<List<string>>(Convert.FromBase64String(aliasB64));
+            return JsonSerializer.Deserialize<List<string>>(Convert.FromBase64String(this.CategoryAliasList));
         }
     }
 }

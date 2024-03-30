@@ -69,7 +69,19 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task AddTicketAlias([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string category, string alias)
         {
+            
+        }
 
+        [SlashCommand("mod-inittickets", "Initializes the ticket Select Menu")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [CommandContextType(InteractionContextType.Guild)]
+        public async Task InitTicketMessage()
+        {
+            List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
+
+            SelectMenuBuilder menu = new SelectMenuBuilder();
+            
+            
         }
 
         [SlashCommand("mod-echoattachment", "Repeats a message from file content")]

@@ -1,19 +1,32 @@
-﻿using Discord;
+﻿using System.Xml;
+using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 
 namespace LuminateDiscordBot.Events;
 
-public class UserJoinVC
+internal class UserJoinVC
 {
-    public static async Task HandleUserJoinVoice(SocketVoiceChannel channel, SocketGuildUser user)
+    public static async Task HandleUserJoinVoice(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
     {
-        ulong channelId = DBManager.GetPrivateJoinVoiceChannel(user.Guild.Id);
+        var channel = state.VoiceChannel;
+        var channelId = DBManager.GetPrivateJoinVoiceChannel(channel.Guild.Id);
+        Console.Out.WriteLine(channelId);
+        Console.Out.WriteLine(channel.Id);
         if (channel.Id == channelId)
         {
-            ulong cat = channel.Category.Id;
-            SocketGuild guild = user.Guild;
-            await user.Guild.CreateVoiceChannelAsync(user.Nickname + "'s Channel", tcp => tcp.CategoryId = cat);
-            //guild.GetVoiceChannel(guild.Channels.First(c => c.Name == user.Nickname + "'s Channel").AddPermissionOverwriteAsync(guild.EveryoneRole, OverwritePermissions.DenyAll(""));
+            var cat = channel.Category.Id;
+            Console.Out.WriteLine(cat);
+            SocketGuild guild = channel.Guild;
+            SocketGuildUser guildUser = state.VoiceChannel.GetUser(user.Id);
+            Console.Out.WriteLine("Started");
+            var privateVc = await guild.CreateVoiceChannelAsync(guildUser.Username + "'s Channel");
+            Console.Out.WriteLine("Done");
+            var lockChannel = new OverwritePermissions(viewChannel: PermValue.Deny);
+            var ownerPermission = new OverwritePermissions(manageChannel: PermValue.Allow);
+            await privateVc.AddPermissionOverwriteAsync(guild.EveryoneRole, lockChannel);
+            await privateVc.AddPermissionOverwriteAsync(guild.GetUser(user.Id), ownerPermission);
+            await guild.MoveAsync(guildUser, privateVc);
         }
     }
 }

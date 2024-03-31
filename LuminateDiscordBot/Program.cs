@@ -42,6 +42,8 @@ namespace LuminateDiscordBot
             client.Ready += OnReady;
             client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
             client.UserJoined += Events.UserJoinHandler.HandleUserServerJoin;
+            client.UserVoiceStateUpdated += Events.UserJoinVC.HandleUserJoinVoice;
+            
             //client.Log += OnLog;
 
             // Events end here

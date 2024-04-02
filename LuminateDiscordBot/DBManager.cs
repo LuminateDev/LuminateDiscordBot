@@ -1,14 +1,7 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SQLite;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Security.Permissions;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
 {
@@ -22,8 +15,8 @@ namespace LuminateDiscordBot
             if(!File.Exists("LuminateConfig/database.db")) { SQLiteConnection.CreateFile("LuminateConfig/database.db"); }
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketDataName TEXT, TicketDataDescription TEXT, TicketDataAutoResponse TEXT DEFAULT NULL, TicketKeywords TEXT DEFAULT [])");
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT)");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketDataName TEXT UNIQUE, TicketDataDescription TEXT, TicketDataAutoResponse TEXT DEFAULT NULL, TicketKeywords TEXT DEFAULT [])");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT UNIQUE)");
             
         }
 
@@ -49,36 +42,99 @@ namespace LuminateDiscordBot
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-
-                ticketCat = connection.Query<Objects.TicketCategory>($"SELECT * FROM TicketCategories WHERE TicketDataName={ticketTopic}").FirstOrDefault();
+                Dictionary<string, object> parameters = new() { { "@ticketData", ticketTopic } };
+                ticketCat = connection.Query<Objects.TicketCategory>($"SELECT * FROM TicketCategories WHERE TicketDataName=@ticketData", parameters).FirstOrDefault();
 
                 connection.Close();
             }
             return ticketCat;
         }
 
-        public static Task<int> AddTicketAlias(string ticketTopic, string ticketAlias)
+        public static int AddTicketAlias(string ticketTopic, string ticketAlias)
         {
             int affected = 0;
-            Objects.TicketCategory TargetTicketCategorie = GetTicketCategoryFromName(ticketTopic);
-            if(TargetTicketCategorie == null) { return Task.FromResult(affected); }
-            TargetTicketCategorie.CategoryAliasList.Add(ticketAlias);
+            Objects.TicketCategory TargetTicketCategory = GetTicketCategoryFromName(ticketTopic);
+            if(TargetTicketCategory == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "UPDATE TicketCategories SET Keywords=@alias WHERE TicketTopic=@topic";
+                    command.CommandText = "UPDATE TicketCategories SET Keywords=@alias WHERE TicketDataName=@topic";
                     command.Parameters.AddWithValue("@alias", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(TargetTicketCategorie.CategoryAliasList))));
                     command.Parameters.AddWithValue("@topic", ticketTopic);
                     affected = command.ExecuteNonQuery();
                 }
                 connection.Close();
-                
             }
-            return Task.FromResult(affected);
+
+            return affected;
         }
+
+        public static void AddOrUpdateTicketCategory(string ticketTopic, string ticketDataName, string ticketDataDescription)
+        {
+            int affected = 0;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO TicketCategories(TicketTopic, TicketDataName, TicektDataDescription) VALUES(@topic, @dataname, @datadescription)";
+                    command.Parameters.AddWithValue("@topic", ticketTopic);
+                    command.Parameters.AddWithValue("@dataname", ticketDataName);
+                    command.Parameters.AddWithValue("@datadescription", ticketDataDescription);
+                    affected = command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            if(affected == 0)
+            {
+                // ADD UPDATE LOGIC
+            }
+        }
+
+        public static int SetTicketAutoResponse(string ticketDataName, string ticketAutoResponse)
+        {
+            int affected = 0;
+            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            if (TargetTicket == null) { return affected; }
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE TicketCategories SET TicketDataAutoResponse=@response WHERE TicketDataName=@dataname";
+                    command.Parameters.AddWithValue("@response", ticketAutoResponse);
+                    command.Parameters.AddWithValue("@dataname", ticketDataName);
+                    affected = command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            return affected;
+        }
+
+        public static int SetTicketDataDescription(string ticketDataName, string ticketDataDescription)
+        {
+            int affected = 0;
+            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            if(TargetTicket == null) { return affected; }
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE TicketCategories SET TicketDataDescription=@desc WHERE TicketDataName=@name";
+                    command.Parameters.AddWithValue("@desc", ticketDataDescription);
+                    command.Parameters.AddWithValue("@name", ticketDataName);
+                    affected = command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            return affected;
+        }
+
+
 
         public static void UpdateInternalChannelConfigs()
         {

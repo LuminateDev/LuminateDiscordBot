@@ -12,7 +12,6 @@ namespace LuminateDiscordBot
     {
         public static Objects.Config Config;
 
-        public static string DefaultSloganText = "Your ideas shine bright";
 
         public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
 

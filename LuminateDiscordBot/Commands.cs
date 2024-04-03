@@ -3,6 +3,7 @@ using Discord.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -24,7 +25,7 @@ namespace LuminateDiscordBot
             embed.Color = Color.Blue;
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - {Utils.DefaultSloganText}"
+                Text = $"Luminate - Your ideas shine bright"
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
         }
@@ -40,7 +41,7 @@ namespace LuminateDiscordBot
             embed.Description = $"Your message will be echoed to the current channel.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - {Utils.DefaultSloganText}"
+                Text = $"Luminate - Your ideas shine bright"
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
 
@@ -52,7 +53,7 @@ namespace LuminateDiscordBot
                 echo.Description = message;
                 echo.Footer = new EmbedFooterBuilder()
                 {
-                    Text = $"Luminate - {Utils.DefaultSloganText}"
+                    Text = $"Luminate - Your ideas shine bright"
                 };
                 await Context.Channel.SendMessageAsync("", false, echo.Build());
                 return;
@@ -63,6 +64,22 @@ namespace LuminateDiscordBot
             }
         }
 
+        [SlashCommand("mod-settickettopic", "Sets or adds a ticket Topic Name")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [CommandContextType(InteractionContextType.Guild)]
+        public async Task AddOrUpdateTicketCategory([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string dataname, string topic, string description)
+        {
+            DBManager.AddOrUpdateTicketCategory(topic, topic, description);
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Title = "Updated!";
+            embed.Description = $"Ticket Category **{dataname}** has been updated!";
+            embed.Color = Color.Blue;
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = "Luminate - Your ideas shine bright"
+            };
+        }
+        
 
         [SlashCommand("mod-addticketalias", "Adds an alias to Ticket Categories")]
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -81,7 +98,14 @@ namespace LuminateDiscordBot
 
             SelectMenuBuilder menu = new SelectMenuBuilder();
             
-            
+            foreach(var ticket in tickets)
+            {
+                menu.AddOption(ticket.CategoryName, ticket.TicketDataName);
+            }
+            menu.Type = ComponentType.SelectMenu;
+            menu.MaxValues = 1;
+
+
         }
 
         [SlashCommand("mod-echoattachment", "Repeats a message from file content")]
@@ -98,7 +122,7 @@ namespace LuminateDiscordBot
             embed.Description = $"Your message will be echoed to the current channel.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - {Utils.DefaultSloganText}"
+                Text = $"Luminate - Your ideas shine bright"
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
 
@@ -110,7 +134,7 @@ namespace LuminateDiscordBot
                 echo.Description = message;
                 echo.Footer = new EmbedFooterBuilder()
                 {
-                    Text = $"Luminate - {Utils.DefaultSloganText}"
+                    Text = $"Luminate - Your ideas shine bright"
                 };
                 await Context.Channel.SendMessageAsync("", false, echo.Build());
                 return;

@@ -25,7 +25,7 @@ namespace LuminateDiscordBot.Autofills
                     string lookupcontext = $"{JsonSerializer.Serialize(ticket)}";
                     if (!String.IsNullOrEmpty(autoCompletInteraction.Data.Current.Value.ToString()))
                     {
-                        if(lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString().ToLower())) { results.Add(new AutocompleteResult(ticket.CategoryName, ticket.CategoryName)); }
+                        if(lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString().ToLower())) { results.Add(new AutocompleteResult(ticket.CategoryName, ticket.TicketDataName)); }
                     } else
                     {
                         results.Add(new AutocompleteResult(ticket.CategoryName, ticket.CategoryName));

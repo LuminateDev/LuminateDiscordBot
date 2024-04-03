@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data.SQLite;
+using System.Security.Permissions;
 using System.Text;
 using System.Text.Json;
 
@@ -62,7 +63,7 @@ namespace LuminateDiscordBot
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
                     command.CommandText = "UPDATE TicketCategories SET Keywords=@alias WHERE TicketDataName=@topic";
-                    command.Parameters.AddWithValue("@alias", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(TargetTicketCategorie.CategoryAliasList))));
+                    command.Parameters.AddWithValue("@alias", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(TargetTicketCategory.GetCategoryAliases()))));
                     command.Parameters.AddWithValue("@topic", ticketTopic);
                     affected = command.ExecuteNonQuery();
                 }
@@ -90,7 +91,8 @@ namespace LuminateDiscordBot
             }
             if(affected == 0)
             {
-                // ADD UPDATE LOGIC
+                SetTicketDataDescription(ticketDataName, ticketDataDescription);
+                SetTicketTopicText(ticketDataName, ticketTopic);
             }
         }
 
@@ -134,7 +136,27 @@ namespace LuminateDiscordBot
             return affected;
         }
 
+        public static int SetTicketTopicText(string ticketDataName, string ticketCategoryText)
+        {
+            int affected = 0;
+            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            if(TargetTicket == null) { return affected; }
 
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE TicketCategories SET TicketTopic=@topic WHERE TicketDataName=@dataname";
+                    command.Parameters.AddWithValue("@topic", ticketCategoryText);
+                    command.Parameters.AddWithValue("@dataname", ticketDataName);
+                    affected = command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
+            return affected;
+        }
 
         public static void UpdateInternalChannelConfigs()
         {

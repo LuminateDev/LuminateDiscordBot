@@ -20,7 +20,7 @@ namespace LuminateDiscordBot
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketKeywords TEXT DEFAULT [])");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT)");
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS CreateVoice_Data(info_channel_id ,channel_id LONG, guild_id LONG)");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS CreateVoice_Data(category_id LONG, channel_id LONG, guild_id LONG)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS CreateVoice_CreatedChannels(guild_id LONG, channel_id LONG, user_id LONG)");
         }
 
@@ -61,7 +61,7 @@ namespace LuminateDiscordBot
             return affected;
         }
 
-        public static void ModifyVoiceChannelConfig(ulong info_channel_id, ulong channelId, ulong guildId)
+        public static void ModifyVoiceChannelConfig(ulong categoryId, ulong channelId, ulong guildId)
         {
             try
             {
@@ -70,8 +70,8 @@ namespace LuminateDiscordBot
                     connection.Open();
                     using (SQLiteCommand command = new(connection))
                     {
-                        command.CommandText = "INSERT INTO CreateVoice_Data (info_channel_id, channel_id, guild_id) VALUES (@info_channel_id, @channel_id, @guild_id)";
-                        command.Parameters.AddWithValue("@info_channel_id", info_channel_id);
+                        command.CommandText = "INSERT OR REPLACE INTO CreateVoice_Data (category_id, channel_id, guild_id) VALUES (@category_id, @channel_id, @guild_id)";
+                        command.Parameters.AddWithValue("@category_id", categoryId);
                         command.Parameters.AddWithValue("@channel_id", channelId);
                         command.Parameters.AddWithValue("@guild_id", guildId);
                         command.ExecuteNonQuery();
@@ -83,6 +83,39 @@ namespace LuminateDiscordBot
             {
                 Console.WriteLine($"Error in ModifyVoiceChannelConfig: {e.Message}");
             }
+        }
+        
+        public static ulong GetCategoryId(ulong guildId)
+        {
+            ulong catId = 0;
+            try
+            {
+                using (SQLiteConnection connection = new(_connectionString))
+                {
+                    connection.Open();
+                    using (SQLiteCommand command = new(connection))
+                    {
+                        command.CommandText = "SELECT category_id FROM CreateVoice_Data WHERE guild_id=@guild_id";
+                        command.Parameters.AddWithValue("@guild_id", guildId);
+                        command.ExecuteNonQuery();
+                        
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                long catIdLong = reader.GetInt64(0);
+                                catId = (ulong)catIdLong;
+                            }
+                        }
+                    }
+                }
+                UpdateInternalChannelConfigs();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in ModifyVoiceChannelConfig: {e.Message}");
+            } 
+            return catId;
         }
         
         public static ulong GetPrivateJoinVoiceChannel(ulong guildId)
@@ -116,6 +149,38 @@ namespace LuminateDiscordBot
                 Console.WriteLine($"Error in ModifyVoiceChannelConfig: {e.Message}");
             }
             return channelId;
+        }
+
+        public static bool SearchPrivateVoiceChannels(ulong guildId, ulong channel_id)
+        {
+            bool entryFound = false;
+            try
+            {
+                using (SQLiteConnection connection = new(_connectionString))
+                {
+                    connection.Open();
+                    using (SQLiteCommand command = new(connection))
+                    {
+                        command.CommandText = "SELECT channel_id FROM CreateVoice_CreatedChannels WHERE guild_id=@guild_id AND channel_id=@channel_id";
+                        command.Parameters.AddWithValue("@guild_id", guildId);
+                        command.Parameters.AddWithValue("@channel_id", channel_id);
+
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                entryFound = true;
+                            }
+                        }
+                    }
+                }
+                UpdateInternalChannelConfigs();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in ModifyVoiceChannelConfig: {e.Message}");
+            }
+            return entryFound;
         }
         
         public static void AddVoiceChannel(ulong channelId, ulong guildId, ulong userId)

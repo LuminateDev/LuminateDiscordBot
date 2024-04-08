@@ -106,10 +106,10 @@ namespace LuminateDiscordBot
         [SlashCommand("mod-setprivatevcchannel", "Sets the channel for users to create a private vc")]
         [RequireUserPermission(GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
-        public async Task SetPrivateVoiceChannelChannel([ChannelTypes(Discord.ChannelType.Text)] IChannel infoChannel ,[ChannelTypes(Discord.ChannelType.Voice)] IChannel targetVoiceChannel, [ChannelTypes(Discord.ChannelType.Text)] IChannel targetInfoChannel)
+        public async Task SetPrivateVoiceChannelChannel([ChannelTypes(Discord.ChannelType.Category)] ICategoryChannel category ,[ChannelTypes(Discord.ChannelType.Voice)] IChannel targetVoiceChannel, [ChannelTypes(Discord.ChannelType.Text)] IChannel targetInfoChannel)
         {
             ulong guild_id = Context.Interaction.GuildId.Value;
-            DBManager.ModifyVoiceChannelConfig(infoChannel.Id ,targetVoiceChannel.Id, guild_id);
+            DBManager.ModifyVoiceChannelConfig(category.Id ,targetVoiceChannel.Id, guild_id);
         }
     }
 }

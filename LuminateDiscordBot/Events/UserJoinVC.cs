@@ -29,12 +29,11 @@ internal class UserJoinVC
                 await privateVc.AddPermissionOverwriteAsync(guild.GetUser(user.Id), ownerPermission);
                 await guild.MoveAsync(socketUser, privateVc);
             }
-
-            var usersVoiceChannel = (socketUser as IVoiceState).VoiceChannel;
+            
             Console.Out.Write("Called!");
-            if (after.VoiceChannel != before.VoiceChannel || after.VoiceChannel == null
+            if (after.VoiceChannel != before.VoiceChannel
                 && before.VoiceChannel.ConnectedUsers.Count == 0
-                &&DBManager.SearchPrivateVoiceChannels(before.VoiceChannel.Guild.Id, before.VoiceChannel.Id))
+                && DBManager.SearchPrivateVoiceChannels(before.VoiceChannel.Guild.Id, before.VoiceChannel.Id))
             {
                 Console.Out.Write("Deleting channel...");
                 await before.VoiceChannel.DeleteAsync();

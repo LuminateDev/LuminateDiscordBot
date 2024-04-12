@@ -7,23 +7,50 @@ namespace LuminateDiscordBot.Events;
 
 public class ButtonHandler
 {
-    
+
     public static async Task HandleButtonEvent(SocketMessageComponent component)
     {
-        
-        switch (component.Data.CustomId)
+        ulong userId = DBManager.CheckOwnershipForPrivateChannel(component.GuildId.Value);
+        if (userId == component.User.Id)
         {
-            case "changeName":
-                try
+
+            switch (component.Data.CustomId)
+            {
+                case "changeName":
                 {
-                    await component.RespondWithModalAsync<Modals>("new_name_input");
+                    await component.RespondWithModalAsync(Modals.ChangeChannelNameModal().Build());
                     break;
                 }
-                catch (Exception ex)
+                case "changeLimit":
                 {
-                    Console.WriteLine(ex.Message);
+                    await component.RespondWithModalAsync(Modals.ChangeUserLimit().Build());
                     break;
                 }
+                case "changePrivacy":
+                {
+                    break;
+                }
+                case "trustPerson":
+                {
+                    break;
+                }
+                case "untrustPerson":
+                {
+                    break;
+                }
+                case "transferOwnership":
+                {
+                    break;
+                }
+                case "deleteChannel":
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            await component.RespondAsync("You don't own a channel.", ephemeral: true);
         }
     }
 }

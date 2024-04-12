@@ -61,6 +61,39 @@ namespace LuminateDiscordBot
             return affected;
         }
 
+        public static ulong CheckOwnershipForPrivateChannel(ulong guildId)
+        {
+            ulong userId = 0;
+            try
+            {
+                using (SQLiteConnection connection = new(_connectionString))
+                {
+                    connection.Open();
+                    using (SQLiteCommand command = new(connection))
+                    {
+                        command.CommandText = "SELECT user_id FROM CreateVoice_CreatedChannels WHERE guild_id=@guild_id";
+                        command.Parameters.AddWithValue("@guild_id", guildId);
+                        command.ExecuteNonQuery();
+                        
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                long userIdLong = reader.GetInt64(0);
+                                userId = (ulong)userIdLong;
+                            }
+                        }
+                    }
+                }
+                UpdateInternalChannelConfigs();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in ModifyVoiceChannelConfig: {e.Message}");
+            } 
+            return userId;
+        }
+        
         public static void ModifyVoiceChannelConfig(ulong categoryId, ulong channelId, ulong guildId)
         {
             try

@@ -1,13 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
 {
@@ -81,14 +73,6 @@ namespace LuminateDiscordBot
         }
         
 
-        [SlashCommand("mod-addticketalias", "Adds an alias to Ticket Categories")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        [CommandContextType(InteractionContextType.Guild)]
-        public async Task AddTicketAlias([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string category, string alias)
-        {
-            
-        }
-
         [SlashCommand("mod-inittickets", "Initializes the ticket Select Menu")]
         [RequireUserPermission(GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
@@ -104,7 +88,22 @@ namespace LuminateDiscordBot
             }
             menu.Type = ComponentType.SelectMenu;
             menu.MaxValues = 1;
+            menu.WithCustomId("ticket-start");
 
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Title = "Open a Ticket";
+            embed.Description = "You can use the menu below to choose a ticket category you wish to open a ticket for.";
+            embed.Color = Color.Blue;
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = $"Luminate - Your ideas shine bright"
+            };
+
+            ComponentBuilder components = new ComponentBuilder();
+            components.WithSelectMenu(menu);
+
+            await RespondAsync("Initializing...", ephemeral: true);
+            await Context.Channel.SendMessageAsync("", false, embed.Build(), components: components.Build());
 
         }
 

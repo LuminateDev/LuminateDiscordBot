@@ -1,9 +1,4 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
 {
@@ -17,7 +12,7 @@ namespace LuminateDiscordBot
             embed.Description = "It seems that you dont have the required permissions to access this command.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - {Utils.DefaultSloganText}"
+                Text = $"Luminate - Your ideas shine bright"
             };
             return embed.Build();
         }

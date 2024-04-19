@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using System.Data.SQLite;
-using System.Security.Permissions;
 using System.Text;
 using System.Text.Json;
 

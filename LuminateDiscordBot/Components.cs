@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,10 @@ namespace LuminateDiscordBot
     public class Components : InteractionModuleBase
     {
 
+        [ComponentInteraction("ticket-start")]
+        public async Task HandleTicketMenu()
+        {
+            
+        }
     }
 }

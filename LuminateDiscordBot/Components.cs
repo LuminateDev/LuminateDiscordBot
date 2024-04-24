@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.Rest;
 using LuminateDiscordBot.Objects;
 
 namespace LuminateDiscordBot
@@ -32,7 +33,9 @@ namespace LuminateDiscordBot
                 return;
             }
 
-            // ADD CHANNEL CREATE LOGIC
+            ITextChannel channel = await Utils.CreateTicketChannel(this);
+            
+            
         }
 
         [ComponentInteraction("ticket-dismiss")]
@@ -44,7 +47,7 @@ namespace LuminateDiscordBot
         [ComponentInteraction("ticket-force")]
         public async Task HandleTicketForce()
         {
-            // HANDLE CHANNEL CREATE LOGIC
+
         }
     }
 }

@@ -17,6 +17,7 @@ namespace LuminateDiscordBot
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketDataName TEXT UNIQUE, TicketDataDescription TEXT, TicketDataAutoResponse TEXT DEFAULT NULL, TicketKeywords TEXT DEFAULT [])");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT UNIQUE)");
+            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS RoleConfig(RoleIdentifier TEXT, RoleId BIGINT UNIQUE)");
             
         }
 
@@ -160,17 +161,23 @@ namespace LuminateDiscordBot
         public static void UpdateInternalChannelConfigs()
         {
             Utils.ChannelConfig.Clear();
+            Utils.RoleConfig.Clear();
             using (SQLiteConnection connection = new(connectionString))
             {
                 connection.Open();
 
                 using (SQLiteCommand command = new(connection))
                 {
-                    command.CommandText = "SELECT * FROM ChannelConfig";
+                    command.CommandText = "SELECT * FROM ChannelConfig; SELECT * FROM RoleConfig";
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         Utils.ChannelConfig.Add(Convert.ToString(reader["ChannelIdentifier"]), Convert.ToUInt64(reader["ChannelId"]));
+                    }
+                    reader.NextResult();
+                    while(reader.Read())
+                    {
+                        Utils.RoleConfig.Add(Convert.ToString(reader["RoleIdentifier"]), Convert.ToUInt64(reader["RoleId"]));
                     }
                 }
 
@@ -217,7 +224,29 @@ namespace LuminateDiscordBot
                 UpdateInternalChannelConfigs();
             }
             catch(Exception e) { Console.WriteLine(e.Message); }
+        }
 
+        public static void ModifyRoleConfig(string identifier, ulong roleId)
+        {
+            try
+            {
+                using (SQLiteConnection connection = new(connectionString))
+                {
+                    connection.Open();
+
+                    using (SQLiteCommand command = new(connection))
+                    {
+                        command.CommandText = $"INSERT OR REPLACE INTO RoleConfig (RoleIdentifier, RoleId) VALUES (@identifier, @role)";
+                        command.Parameters.AddWithValue("@identifier", identifier);
+                        command.Parameters.AddWithValue("@role", roleId);
+                        command.ExecuteNonQuery();
+                    }
+
+                    connection.Close();
+                }
+                UpdateInternalChannelConfigs();
+            }
+            catch (Exception e) { Console.WriteLine(e.Message); }
         }
 
 

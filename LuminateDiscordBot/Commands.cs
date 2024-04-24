@@ -22,6 +22,24 @@ namespace LuminateDiscordBot
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
         }
 
+        [SlashCommand("mod-setrolerule", "Adds or updates the role config")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [CommandContextType(InteractionContextType.Guild)]
+        public async Task ModifyRoleRules([Summary("role_identifier", "The internal Identifier you modify")] string roleIdentifier, IRole targetRole)
+        {
+            DBManager.ModifyRoleConfig(roleIdentifier, targetRole.Id);
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Title = "Updated!";
+            embed.Description = "You have successfully updated the Role Config.";
+            embed.Color = Color.Blue;
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = $"Luminate - Your ideas shine bright"
+            };
+            await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+        }
+
+
         [SlashCommand("mod-echo", "Repeats a message as the bot")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
@@ -70,8 +88,27 @@ namespace LuminateDiscordBot
             {
                 Text = "Luminate - Your ideas shine bright"
             };
+            await RespondAsync("", new[] { embed.Build() });
         }
-        
+
+
+        [SlashCommand("mod-ticketsetresponse", "Sets a tickets auto response")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [CommandContextType(InteractionContextType.Guild)]
+        public async Task SetTicketAutoResponse([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string dataname, string description)
+        {
+            DBManager.SetTicketAutoResponse(dataname, description);
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Title = "Updated!";
+            embed.Description = $"Ticket Category **{dataname}** has been updated!";
+            embed.Color = Color.Blue;
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = "Luminate - Your ideas shine bright"
+            };
+            await RespondAsync("", new[] { embed.Build() });
+        }
+
 
         [SlashCommand("mod-inittickets", "Initializes the ticket Select Menu")]
         [RequireUserPermission(GuildPermission.Administrator)]

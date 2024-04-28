@@ -11,14 +11,14 @@ namespace LuminateDiscordBot
 
         public static void InitDB()
         {
-            
-            if(!File.Exists("LuminateConfig/database.db")) { SQLiteConnection.CreateFile("LuminateConfig/database.db"); }
+
+            if (!File.Exists("LuminateConfig/database.db")) { SQLiteConnection.CreateFile("LuminateConfig/database.db"); }
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS UserStats(DiscordId BIGINT, MessagesSent BIGINT DEFAULT 0, Level INT DEFAULT 1, XP INT DEFAULT 0)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS SelectionRoles(RoleId BIGINT)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS TicketCategories(TicketTopic TEXT, TicketDataName TEXT UNIQUE, TicketDataDescription TEXT, TicketDataAutoResponse TEXT DEFAULT NULL, TicketKeywords TEXT DEFAULT [])");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS ChannelConfig(ChannelIdentifier TEXT, ChannelId BIGINT UNIQUE)");
             ExecuteNonQuery("CREATE TABLE IF NOT EXISTS RoleConfig(RoleIdentifier TEXT, RoleId BIGINT UNIQUE)");
-            
+
         }
 
         public static List<Objects.TicketCategory> GetTicketCategories()
@@ -31,7 +31,7 @@ namespace LuminateDiscordBot
 
                 cats = connection.Query<Objects.TicketCategory>("SELECT * FROM TicketCategories").AsList();
 
-               connection.Close();
+                connection.Close();
             }
 
             return cats;
@@ -55,7 +55,7 @@ namespace LuminateDiscordBot
         {
             int affected = 0;
             Objects.TicketCategory TargetTicketCategory = GetTicketCategoryFromName(ticketTopic);
-            if(TargetTicketCategory == null) { return affected; }
+            if (TargetTicketCategory == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -81,7 +81,7 @@ namespace LuminateDiscordBot
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "INSERT OR IGNORE INTO TicketCategories(TicketTopic, TicketDataName, TicektDataDescription) VALUES(@topic, @dataname, @datadescription)";
+                    command.CommandText = "INSERT OR IGNORE INTO TicketCategories(TicketTopic, TicketDataName, TicketDataDescription) VALUES(@topic, @dataname, @datadescription)";
                     command.Parameters.AddWithValue("@topic", ticketTopic);
                     command.Parameters.AddWithValue("@dataname", ticketDataName);
                     command.Parameters.AddWithValue("@datadescription", ticketDataDescription);
@@ -89,7 +89,7 @@ namespace LuminateDiscordBot
                 }
                 connection.Close();
             }
-            if(affected == 0)
+            if (affected == 0)
             {
                 SetTicketDataDescription(ticketDataName, ticketDataDescription);
                 SetTicketTopicText(ticketDataName, ticketTopic);
@@ -120,7 +120,7 @@ namespace LuminateDiscordBot
         {
             int affected = 0;
             Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
-            if(TargetTicket == null) { return affected; }
+            if (TargetTicket == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -140,7 +140,7 @@ namespace LuminateDiscordBot
         {
             int affected = 0;
             Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
-            if(TargetTicket == null) { return affected; }
+            if (TargetTicket == null) { return affected; }
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -175,7 +175,7 @@ namespace LuminateDiscordBot
                         Utils.ChannelConfig.Add(Convert.ToString(reader["ChannelIdentifier"]), Convert.ToUInt64(reader["ChannelId"]));
                     }
                     reader.NextResult();
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         Utils.RoleConfig.Add(Convert.ToString(reader["RoleIdentifier"]), Convert.ToUInt64(reader["RoleId"]));
                     }
@@ -223,7 +223,7 @@ namespace LuminateDiscordBot
                 }
                 UpdateInternalChannelConfigs();
             }
-            catch(Exception e) { Console.WriteLine(e.Message); }
+            catch (Exception e) { Console.WriteLine(e.Message); }
         }
 
         public static void ModifyRoleConfig(string identifier, ulong roleId)
@@ -258,12 +258,12 @@ namespace LuminateDiscordBot
             {
                 connection.Open();
 
-                using(SQLiteCommand command = new SQLiteCommand(connection))
+                using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
                     command.CommandText = query;
                     command.ExecuteNonQuery();
                 }
-                    
+
                 connection.Close();
             }
         }

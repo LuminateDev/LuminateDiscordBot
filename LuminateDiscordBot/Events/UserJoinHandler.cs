@@ -25,8 +25,9 @@ namespace LuminateDiscordBot.Events
             try
             {
                 await user.Guild.GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
-            }catch(Exception e) { await Console.Out.WriteLineAsync(e.Message); }
-            
+            }
+            catch (Exception e) { await Console.Out.WriteLineAsync(e.Message); }
+
         }
     }
 }

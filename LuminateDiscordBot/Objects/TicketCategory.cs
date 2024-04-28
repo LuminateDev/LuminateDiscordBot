@@ -10,7 +10,7 @@ namespace LuminateDiscordBot.Objects
 {
     public class TicketCategory
     {
-        public string CategoryName { get; set; }
+        public string TicketTopic { get; set; }
         public string CategoryAliasList { get; set; }
         public string TicketDataName { get; set; }
         public string TicketDataDescription { get; set; }

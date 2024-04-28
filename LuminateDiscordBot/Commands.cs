@@ -79,20 +79,19 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task AddOrUpdateTicketCategory([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string dataname, string topic, string description)
         {
-            DBManager.AddOrUpdateTicketCategory(topic, topic, description);
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.Title = "Updated!";
-            embed.Description = $"Ticket Category **{dataname}** has been updated!";
-            embed.Color = Color.Blue;
-            embed.Footer = new EmbedFooterBuilder()
-            {
-                Text = "Luminate - Your ideas shine bright"
-            };
-            await RespondAsync("", new[] { embed.Build() });
+                DBManager.AddOrUpdateTicketCategory(topic, dataname, description);
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Title = "Updated!";
+                embed.Description = $"Ticket Category **{dataname}** has been updated!";
+                embed.Color = Color.Blue;
+                embed.Footer = new EmbedFooterBuilder()
+                {
+                    Text = "Luminate - Your ideas shine bright"
+                };
+                await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
         }
 
-
-        [SlashCommand("mod-ticketsetresponse", "Sets a tickets auto response")]
+        [SlashCommand("mod-setticketresponse", "Sets a tickets auto response")]
         [RequireUserPermission(GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
         public async Task SetTicketAutoResponse([Summary("category"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler.TicketAutoCompleteLoader))] string dataname, string description)
@@ -106,7 +105,7 @@ namespace LuminateDiscordBot
             {
                 Text = "Luminate - Your ideas shine bright"
             };
-            await RespondAsync("", new[] { embed.Build() });
+            await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
         }
 
 
@@ -115,32 +114,33 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task InitTicketMessage()
         {
-            List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
+                List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
 
-            SelectMenuBuilder menu = new SelectMenuBuilder();
-            
-            foreach(var ticket in tickets)
-            {
-                menu.AddOption(ticket.CategoryName, ticket.TicketDataName);
-            }
-            menu.Type = ComponentType.SelectMenu;
-            menu.MaxValues = 1;
-            menu.WithCustomId("ticket-start");
+                SelectMenuBuilder menu = new SelectMenuBuilder();
 
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.Title = "Open a Ticket";
-            embed.Description = "You can use the menu below to choose a ticket category you wish to open a ticket for.";
-            embed.Color = Color.Blue;
-            embed.Footer = new EmbedFooterBuilder()
-            {
-                Text = $"Luminate - Your ideas shine bright"
-            };
+                foreach (var ticket in tickets)
+                {
+                    menu.AddOption(ticket.TicketTopic, ticket.TicketDataName);
+                }
+                menu.Type = ComponentType.SelectMenu;
+                menu.MaxValues = 1;
+                menu.WithCustomId("ticket-start");
 
-            ComponentBuilder components = new ComponentBuilder();
-            components.WithSelectMenu(menu);
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Title = "Open a Ticket";
+                embed.Description = "You can use the menu below to choose a ticket category you wish to open a ticket for.";
+                embed.Color = Color.Blue;
+                embed.Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Luminate - Your ideas shine bright"
+                };
 
-            await RespondAsync("Initializing...", ephemeral: true);
-            await Context.Channel.SendMessageAsync("", false, embed.Build(), components: components.Build());
+                ComponentBuilder components = new ComponentBuilder();
+                components.WithSelectMenu(menu);
+
+                await RespondAsync("Initializing...", ephemeral: true);
+                await Context.Channel.SendMessageAsync("", false, embed.Build(), components: components.Build());
+
 
         }
 

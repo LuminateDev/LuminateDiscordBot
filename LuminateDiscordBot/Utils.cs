@@ -16,8 +16,8 @@ namespace LuminateDiscordBot
 
         public static void FileCheck()
         {
-            if(!Directory.Exists("LuminateConfig")) { CreateFiles(); }
-            if(!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
+            if (!Directory.Exists("LuminateConfig")) { CreateFiles(); }
+            if (!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
         }
 
         public static void ReadFiles()

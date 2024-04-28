@@ -19,7 +19,7 @@ namespace LuminateDiscordBot
             Utils.ReadFiles();
             DBManager.InitDB();
             DBManager.UpdateInternalChannelConfigs();
-            if(Utils.Config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
+            if (Utils.Config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
 
             DiscordSocketConfig socketConfig = new DiscordSocketConfig()
             {
@@ -35,13 +35,12 @@ namespace LuminateDiscordBot
             _interactionService = new InteractionService(client.Rest);
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
-
             // Events
 
             client.Ready += OnReady;
             client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
             client.UserJoined += Events.UserJoinHandler.HandleUserServerJoin;
-            
+
             //client.Log += OnLog;
 
             // Events end here
@@ -58,7 +57,8 @@ namespace LuminateDiscordBot
                     await _interactionService.RegisterCommandsGloballyAsync(true);
                     await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
                     Console.WriteLine("Bot Online!");
-                }catch(Exception e) { Console.WriteLine(e.Message); }
+                }
+                catch (Exception e) { Console.WriteLine(e.Message); }
 
             }
 

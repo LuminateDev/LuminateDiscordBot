@@ -17,7 +17,7 @@ namespace LuminateDiscordBot
             return embed.Build();
         }
 
-        public static Embed TicketInitMessage(string topic, string issue,ulong user)
+        public static Embed TicketInitMessage(string topic, string issue, ulong user)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Title = "Incoming Ticket!";

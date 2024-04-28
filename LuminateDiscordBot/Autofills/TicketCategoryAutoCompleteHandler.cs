@@ -20,15 +20,16 @@ namespace LuminateDiscordBot.Autofills
 
                 List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
 
-                foreach(var ticket in tickets)
+                foreach (var ticket in tickets)
                 {
                     string lookupcontext = $"{JsonSerializer.Serialize(ticket)}";
                     if (!String.IsNullOrEmpty(autoCompletInteraction.Data.Current.Value.ToString()))
                     {
-                        if(lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString().ToLower())) { results.Add(new AutocompleteResult(ticket.CategoryName, ticket.TicketDataName)); }
-                    } else
+                        if (lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString().ToLower())) { results.Add(new AutocompleteResult(ticket.TicketTopic, ticket.TicketDataName)); }
+                    }
+                    else
                     {
-                        results.Add(new AutocompleteResult(ticket.CategoryName, ticket.CategoryName));
+                        results.Add(new AutocompleteResult(ticket.TicketTopic, ticket.TicketDataName));
                     }
                 }
 

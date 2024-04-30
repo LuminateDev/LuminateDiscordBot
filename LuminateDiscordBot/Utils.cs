@@ -10,6 +10,7 @@ namespace LuminateDiscordBot
     {
         public static Objects.Config? Config;
 
+        public const string SloganText = "Luminate - Your ideas shine bright";
 
         public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
         public static Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();

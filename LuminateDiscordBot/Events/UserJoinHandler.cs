@@ -20,7 +20,7 @@ namespace LuminateDiscordBot.Events
                 $"We hope you have a nice stay.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shind bright"
+                Text = Utils.SloganText
             };
             try
             {

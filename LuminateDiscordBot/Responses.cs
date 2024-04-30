@@ -12,7 +12,7 @@ namespace LuminateDiscordBot
             embed.Description = "It seems that you dont have the required permissions to access this command.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             return embed.Build();
         }

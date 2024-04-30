@@ -37,9 +37,9 @@ namespace LuminateDiscordBot
             return cats;
         }
 
-        public static Objects.TicketCategory GetTicketCategoryFromName(string ticketTopic)
+        public static Objects.TicketCategory? GetTicketCategoryFromName(string ticketTopic)
         {
-            Objects.TicketCategory ticketCat = null;
+            Objects.TicketCategory? ticketCat = null;
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -54,7 +54,7 @@ namespace LuminateDiscordBot
         public static int AddTicketAlias(string ticketTopic, string ticketAlias)
         {
             int affected = 0;
-            Objects.TicketCategory TargetTicketCategory = GetTicketCategoryFromName(ticketTopic);
+            Objects.TicketCategory? TargetTicketCategory = GetTicketCategoryFromName(ticketTopic);
             if (TargetTicketCategory == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -99,7 +99,7 @@ namespace LuminateDiscordBot
         public static int SetTicketAutoResponse(string ticketDataName, string ticketAutoResponse)
         {
             int affected = 0;
-            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            Objects.TicketCategory? TargetTicket = GetTicketCategoryFromName(ticketDataName);
             if (TargetTicket == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -119,7 +119,7 @@ namespace LuminateDiscordBot
         public static int SetTicketDataDescription(string ticketDataName, string ticketDataDescription)
         {
             int affected = 0;
-            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            Objects.TicketCategory? TargetTicket = GetTicketCategoryFromName(ticketDataName);
             if (TargetTicket == null) { return affected; }
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {

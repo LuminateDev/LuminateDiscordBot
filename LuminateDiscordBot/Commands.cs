@@ -17,7 +17,7 @@ namespace LuminateDiscordBot
             embed.Color = Color.Blue;
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
         }
@@ -34,7 +34,7 @@ namespace LuminateDiscordBot
             embed.Color = Color.Blue;
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
         }
@@ -51,7 +51,7 @@ namespace LuminateDiscordBot
             embed.Description = $"Your message will be echoed to the current channel.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
 
@@ -63,7 +63,7 @@ namespace LuminateDiscordBot
                 echo.Description = message;
                 echo.Footer = new EmbedFooterBuilder()
                 {
-                    Text = $"Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
                 await Context.Channel.SendMessageAsync("", false, echo.Build());
                 return;
@@ -86,7 +86,7 @@ namespace LuminateDiscordBot
                 embed.Color = Color.Blue;
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = "Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
                 await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
         }
@@ -103,7 +103,7 @@ namespace LuminateDiscordBot
             embed.Color = Color.Blue;
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = "Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
         }
@@ -132,7 +132,7 @@ namespace LuminateDiscordBot
                 embed.Color = Color.Blue;
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = $"Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
 
                 ComponentBuilder components = new ComponentBuilder();
@@ -158,7 +158,7 @@ namespace LuminateDiscordBot
             embed.Description = $"Your message will be echoed to the current channel.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
 
@@ -170,7 +170,7 @@ namespace LuminateDiscordBot
                 echo.Description = message;
                 echo.Footer = new EmbedFooterBuilder()
                 {
-                    Text = $"Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
                 await Context.Channel.SendMessageAsync("", false, echo.Build());
                 return;

@@ -14,8 +14,8 @@ namespace LuminateDiscordBot
         {
             IComponentInteraction interaction = (IComponentInteraction)Context.Interaction;
 
-            TicketCategory ticket = DBManager.GetTicketCategoryFromName(interaction.Data.Values.First());
-            if (ticket.TicketDataAutoResponse != null)
+            TicketCategory? ticket = DBManager.GetTicketCategoryFromName(interaction.Data.Values.First());
+            if (ticket?.TicketDataAutoResponse != null)
             {
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.Title = "Attention.";
@@ -23,7 +23,7 @@ namespace LuminateDiscordBot
                 embed.Color = Color.Blue;
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = "Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
 
                 ComponentBuilder components = new ComponentBuilder();
@@ -34,7 +34,7 @@ namespace LuminateDiscordBot
                 return;
             }
 
-            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{ticket.TicketDataName}");
+            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{ticket?.TicketDataName}");
 
 
         }
@@ -56,7 +56,7 @@ namespace LuminateDiscordBot
         [ModalInteraction("ticket-modal:*")]
         public async Task HandleModal(string dataName, Models.TicketCreationModalModel modal)
         {
-            TicketCategory ticket = DBManager.GetTicketCategoryFromName(dataName);
+            TicketCategory? ticket = DBManager.GetTicketCategoryFromName(dataName);
             ITextChannel channel = await Utils.CreateTicketChannel(this);
 
             EmbedBuilder embed = new EmbedBuilder();
@@ -65,13 +65,13 @@ namespace LuminateDiscordBot
             embed.Description = $"Your ticket has been created successfully!\nCheck <#{channel.Id}> to discuss your issue with Luminate Staff.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = "Luminate - Your ideas shine bright"
+                Text = Utils.SloganText
             };
 
             ComponentBuilder components = new ComponentBuilder();
             components.WithButton("Close this ticket", $"ticket-close:{channel.Id}", ButtonStyle.Danger);
 
-            channel.SendMessageAsync($"<@&{Utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+            channel.SendMessageAsync($"<@&{Utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket?.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
 
         }
@@ -90,7 +90,7 @@ namespace LuminateDiscordBot
                 embed.Description = "You can not manually close a ticket, Team Luminate will handle this for you once your request is completed!";
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = "Luminate - Your ideas shine bright"
+                    Text = Utils.SloganText
                 };
 
                 await RespondAsync("", new[] { embed.Build() }, ephemeral: true);

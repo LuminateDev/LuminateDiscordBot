@@ -8,9 +8,9 @@ namespace LuminateDiscordBot
 {
     internal class Program
     {
-        public static ServiceProvider _services;
-        public static InteractionService _interactionService;
-        public static DiscordSocketClient client;
+        public static ServiceProvider? _services;
+        public static InteractionService? _interactionService;
+        public static DiscordSocketClient? client;
 
         static async Task Main(string[] args)
         {
@@ -19,7 +19,7 @@ namespace LuminateDiscordBot
             Utils.ReadFiles();
             DBManager.InitDB();
             DBManager.UpdateInternalChannelConfigs();
-            if (Utils.Config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
+            if (Utils.Config?.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
 
             DiscordSocketConfig socketConfig = new DiscordSocketConfig()
             {
@@ -30,7 +30,7 @@ namespace LuminateDiscordBot
             };
             client = new DiscordSocketClient(socketConfig);
 
-            await client.LoginAsync(TokenType.Bot, Utils.Config.BotToken);
+            await client.LoginAsync(TokenType.Bot, Utils.Config?.BotToken);
             await client.StartAsync();
             _interactionService = new InteractionService(client.Rest);
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -40,8 +40,9 @@ namespace LuminateDiscordBot
             client.Ready += OnReady;
             client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
             client.UserJoined += Events.UserJoinHandler.HandleUserServerJoin;
-
-            //client.Log += OnLog;
+#if DEBUG
+            client.Log += OnLog;
+#endif
 
             // Events end here
 
@@ -62,10 +63,12 @@ namespace LuminateDiscordBot
 
             }
 
+#if DEBUG
             async Task OnLog(LogMessage msg)
             {
                 Console.WriteLine(msg.Message);
             }
+#endif
         }
 
     }

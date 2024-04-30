@@ -8,7 +8,7 @@ namespace LuminateDiscordBot
 {
     internal class Utils
     {
-        public static Objects.Config Config;
+        public static Objects.Config? Config;
 
 
         public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();

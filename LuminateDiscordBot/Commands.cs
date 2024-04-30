@@ -43,7 +43,7 @@ namespace LuminateDiscordBot
         [SlashCommand("mod-echo", "Repeats a message as the bot")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
-        public async Task EchoMessage(string message, bool asEmbed = false, string embedTitle = null)
+        public async Task EchoMessage(string message, bool asEmbed = false, string? embedTitle = null)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Color = Color.Blue;
@@ -147,7 +147,7 @@ namespace LuminateDiscordBot
         [SlashCommand("mod-echoattachment", "Repeats a message from file content")]
         [RequireUserPermission(GuildPermission.Administrator)]
         [CommandContextType(InteractionContextType.Guild)]
-        public async Task EchoMessageFromFile(IAttachment file, bool asEmbed = false, string embedTitle = null)
+        public async Task EchoMessageFromFile(IAttachment file, bool asEmbed = false, string? embedTitle = null)
         {
 
             string message = new HttpClient().GetAsync(file.Url).Result.Content.ReadAsStringAsync().Result;

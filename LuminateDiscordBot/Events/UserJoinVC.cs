@@ -1,6 +1,4 @@
-﻿using System.Xml;
-using Discord;
-using Discord.Rest;
+﻿using Discord;
 using Discord.WebSocket;
 
 namespace LuminateDiscordBot.Events;

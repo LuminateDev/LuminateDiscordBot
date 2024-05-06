@@ -139,7 +139,7 @@ namespace LuminateDiscordBot
         public static int SetTicketTopicText(string ticketDataName, string ticketCategoryText)
         {
             int affected = 0;
-            Objects.TicketCategory TargetTicket = GetTicketCategoryFromName(ticketDataName);
+            Objects.TicketCategory? TargetTicket = GetTicketCategoryFromName(ticketDataName);
             if (TargetTicket == null) { return affected; }
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -172,12 +172,12 @@ namespace LuminateDiscordBot
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Utils.ChannelConfig.Add(Convert.ToString(reader["ChannelIdentifier"]), Convert.ToUInt64(reader["ChannelId"]));
+                        Utils.ChannelConfig.Add(Convert.ToString(reader.GetString(reader.GetOrdinal("ChannelIdentifier"))), Convert.ToUInt64(reader.GetInt64(reader.GetOrdinal("ChannelId"))));
                     }
                     reader.NextResult();
                     while (reader.Read())
                     {
-                        Utils.RoleConfig.Add(Convert.ToString(reader["RoleIdentifier"]), Convert.ToUInt64(reader["RoleId"]));
+                        Utils.RoleConfig.Add(reader.GetString(reader.GetOrdinal("RoleIdentifier")), Convert.ToUInt64(reader.GetInt64(reader.GetOrdinal("RoleId"))));
                     }
                 }
 
@@ -267,5 +267,8 @@ namespace LuminateDiscordBot
                 connection.Close();
             }
         }
+
+
+
     }
 }

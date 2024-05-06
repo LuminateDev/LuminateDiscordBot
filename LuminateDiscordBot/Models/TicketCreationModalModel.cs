@@ -16,7 +16,7 @@ namespace LuminateDiscordBot.Models
         [RequiredInput(true)]
         [InputLabel("State your issue")]
         [ModalTextInput("problem", Discord.TextInputStyle.Paragraph, "Please enter your issue here", 1, 1000)]
-        public string Reason { get; set; }
+        public required string Reason { get; set; }
 
     }
 }

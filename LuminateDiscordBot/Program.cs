@@ -11,6 +11,7 @@ namespace LuminateDiscordBot
         public static ServiceProvider? _services;
         public static InteractionService? _interactionService;
         public static DiscordSocketClient? client;
+        
 
         static async Task Main(string[] args)
         {
@@ -55,9 +56,11 @@ namespace LuminateDiscordBot
             {
                 try
                 {
+#pragma warning disable
                     await _interactionService.RegisterCommandsGloballyAsync(true);
                     await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
                     Console.WriteLine("Bot Online!");
+#pragma warning enable
                 }
                 catch (Exception e) { Console.WriteLine(e.Message); }
 

@@ -20,13 +20,14 @@ namespace LuminateDiscordBot.Events
                 $"We hope you have a nice stay.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = $"Luminate - {Utils.DefaultSloganText}"
+                Text = Utils.SloganText
             };
             try
             {
                 await user.Guild.GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
-            }catch(Exception e) { await Console.Out.WriteLineAsync(e.Message); }
-            
+            }
+            catch (Exception e) { await Console.Out.WriteLineAsync(e.Message); }
+
         }
     }
 }

@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using Discord;
+using Discord.Interactions;
+using Discord.Rest;
+using Discord.WebSocket;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
 {
     internal class Utils
     {
-        public static Objects.Config Config;
+        public static Objects.Config? Config;
 
-        public static string DefaultSloganText = "Your ideas shine bright";
+        public const string SloganText = "Luminate - Your ideas shine bright";
 
         public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
+        public static Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();
 
         public static void FileCheck()
         {
-            if(!Directory.Exists("LuminateConfig")) { CreateFiles(); }
-            if(!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
+            if (!Directory.Exists("LuminateConfig")) { CreateFiles(); }
+            if (!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
         }
 
         public static void ReadFiles()
@@ -36,6 +35,17 @@ namespace LuminateDiscordBot
         static void WriteConfig()
         {
             using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(Config), new JsonSerializerOptions() { WriteIndented = true }); }
+        }
+
+
+
+        public async static Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
+        {
+            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = Utils.ChannelConfig["ticket_category"]);
+            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(Utils.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.AllowAll(channel));
+            return channel;
         }
     }
 }

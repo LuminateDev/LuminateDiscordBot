@@ -8,3 +8,14 @@ Build info:<br>
 ![Dev Branch](https://github.com/LuminateDev/LuminateDiscordBot/actions/workflows/dotnet.yml/badge.svg?branch=dev)<br>
 <b>Release Branch</b><br>
 ![Release Branch](https://github.com/LuminateDev/LuminateDiscordBot/actions/workflows/dotnet.yml/badge.svg?branch=master)
+
+
+### Identifier Wiki
+<details>
+<summary>Identifier List</summary>
+<ul>
+<li>welcome_channel - The channel/id used to welcome members</li>
+<li>ticket_category - The category/id used in the ticket creation process</li>
+<li>ticket_role - The role/id of the role that gets pinged in tickets</li>
+</ul>
+</details>

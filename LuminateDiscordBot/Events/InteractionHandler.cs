@@ -13,7 +13,9 @@ namespace LuminateDiscordBot.Events
         public static async Task HandleInteraction(SocketInteraction interaction)
         {
             SocketInteractionContext context = new SocketInteractionContext(Program.client, interaction);
+#pragma warning disable
             IResult result = await Program._interactionService.ExecuteCommandAsync(context, Program._services);
+#pragma warning enable
         }
     }
 }

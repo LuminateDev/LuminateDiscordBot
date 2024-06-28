@@ -71,8 +71,9 @@ namespace LuminateDiscordBot
             ComponentBuilder components = new ComponentBuilder();
             components.WithButton("Close this ticket", $"ticket-close:{channel.Id}", ButtonStyle.Danger);
 
-            channel.SendMessageAsync($"<@&{Utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket?.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+            await channel.SendMessageAsync($"<@&{Utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
 
         }
 

@@ -44,7 +44,7 @@ namespace LuminateDiscordBot
             ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = Utils.ChannelConfig["ticket_category"]);
             await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
             await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(Utils.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
-            await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.AllowAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.InheritAll);
             return channel;
         }
     }

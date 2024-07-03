@@ -8,7 +8,7 @@ namespace LuminateDiscordBot
 {
     internal class Program
     {
-        public static ServiceProvider? _services;
+        public static ServiceProvider? _services = null;
         public static InteractionService? _interactionService;
         public static DiscordSocketClient? client;
         

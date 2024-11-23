@@ -27,7 +27,6 @@ namespace LuminateDiscordBot
                 GatewayIntents = Discord.GatewayIntents.All,
                 LogLevel = Discord.LogSeverity.Info,
                 UseInteractionSnowflakeDate = false,
-                AlwaysDownloadUsers = true,
             };
             client = new DiscordSocketClient(socketConfig);
 
@@ -38,11 +37,46 @@ namespace LuminateDiscordBot
 
             // Events
 
-            client.Ready += OnReady;
-            client.InteractionCreated += Events.InteractionHandler.HandleInteraction;
-            client.UserJoined += Events.UserJoinHandler.HandleUserServerJoin;
+            client.Ready += async () =>
+            {
+                try
+                {
+                    await _interactionService.RegisterCommandsGloballyAsync(true);
+                    await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
+                    Console.WriteLine("Bot Online!");
+                }catch(Exception e) { Console.WriteLine($"Unable to finalize initialization: {e.Message}"); }
+            };
+            client.InteractionCreated += async (socketInteraction) =>
+            {
+                SocketInteractionContext context = new SocketInteractionContext(client, socketInteraction);
+                var result = await _interactionService.ExecuteCommandAsync(context, _services);
+            };
+            client.UserJoined += async (guildUser) =>
+            {
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Title = "Welcome to Luminate";
+                embed.Color = Color.Blue;
+                embed.Description = $"Welcome **{guildUser.Mention}** to the Luminate Discord Server!\n" +
+                    $"We hope you have a nice stay.";
+                embed.Footer = new EmbedFooterBuilder()
+                {
+                    Text = Utils.SloganText
+                };
+                try
+                {
+                    await guildUser.Guild.GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
+                }
+                catch (Exception e) { await Console.Out.WriteLineAsync(e.Message); }
+
+            };
+
 #if DEBUG
-            client.Log += OnLog;
+            // Only prints out Log Messages if the bot is run in a debug build
+            client.Log += (logMessage) =>
+            {
+                Console.WriteLine(logMessage.Message);
+                return Task.CompletedTask;
+            };
 #endif
 
             // Events end here
@@ -50,28 +84,6 @@ namespace LuminateDiscordBot
             Console.WriteLine("Setup Complete");
 
             await Task.Delay(-1);
-
-
-            async Task OnReady()
-            {
-                try
-                {
-#pragma warning disable
-                    await _interactionService.RegisterCommandsGloballyAsync(true);
-                    await client.SetGameAsync("/luminate-help", "", ActivityType.Listening);
-                    Console.WriteLine("Bot Online!");
-#pragma warning enable
-                }
-                catch (Exception e) { Console.WriteLine(e.Message); }
-
-            }
-
-#if DEBUG
-            async Task OnLog(LogMessage msg)
-            {
-                Console.WriteLine(msg.Message);
-            }
-#endif
         }
 
     }

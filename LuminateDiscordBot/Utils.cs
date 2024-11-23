@@ -6,44 +6,35 @@ using System.Text.Json;
 
 namespace LuminateDiscordBot
 {
-    internal class Utils
+    public class Utils
     {
-        public static Objects.Config? Config;
 
-        public const string SloganText = "Luminate - Your ideas shine bright";
+        public Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
+        public Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();
 
-        public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
-        public static Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();
-
-        public static void FileCheck()
+        public Task FileCheck()
         {
             if (!Directory.Exists("LuminateConfig")) { CreateFiles(); }
             if (!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
+            return Task.CompletedTask;
         }
 
-        public static void ReadFiles()
-        {
-            Config = JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText("LuminateConfig/config.json"));
-        }
+        public Objects.Config GetConfig() => JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText("LuminateConfig/config.json"))!;
 
-        static void CreateFiles()
+        private Task CreateFiles()
         {
             Directory.CreateDirectory("LuminateConfig");
             using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
-        }
-
-        static void WriteConfig()
-        {
-            using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(Config), new JsonSerializerOptions() { WriteIndented = true }); }
+            return Task.CompletedTask;
         }
 
 
 
-        public async static Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
+        public async Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
         {
-            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = Utils.ChannelConfig["ticket_category"]);
+            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = this.ChannelConfig["ticket_category"]);
             await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
-            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(Utils.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(this.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
             await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.InheritAll);
             return channel;
         }

@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using SQLitePCL;
 using System.Reflection;
 
 namespace LuminateDiscordBot
@@ -11,26 +12,28 @@ namespace LuminateDiscordBot
         public static ServiceProvider? _services = null;
         public static InteractionService? _interactionService;
         public static DiscordSocketClient? client;
-        
+
+        private static Utils _utils = new Utils();
 
         static async Task Main(string[] args)
         {
+            
             Console.WriteLine("Starting Bot...");
-            Utils.FileCheck();
-            Utils.ReadFiles();
+            await _utils.FileCheck();
+            var config = _utils.GetConfig();
             DBManager.InitDB();
             DBManager.UpdateInternalChannelConfigs();
-            if (Utils.Config?.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
+            if (config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
 
             DiscordSocketConfig socketConfig = new DiscordSocketConfig()
             {
                 GatewayIntents = Discord.GatewayIntents.All,
-                LogLevel = Discord.LogSeverity.Info,
+                LogLevel = Discord.LogSeverity.Debug,
                 UseInteractionSnowflakeDate = false,
             };
             client = new DiscordSocketClient(socketConfig);
 
-            await client.LoginAsync(TokenType.Bot, Utils.Config?.BotToken);
+            await client.LoginAsync(TokenType.Bot, config.BotToken);
             await client.StartAsync();
             _interactionService = new InteractionService(client.Rest);
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -60,11 +63,11 @@ namespace LuminateDiscordBot
                     $"We hope you have a nice stay.";
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = Utils.SloganText
+                    Text = Constants.FOOTER_TEXT
                 };
                 try
                 {
-                    await guildUser.Guild.GetTextChannel(Utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
+                    await guildUser.Guild.GetTextChannel(_utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
                 }
                 catch (Exception e) { await Console.Out.WriteLineAsync(e.Message); }
 

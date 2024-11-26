@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SQLitePCL;
 using System.Reflection;
@@ -74,7 +75,7 @@ namespace LuminateDiscordBot
             };
 
 #if DEBUG
-            // Only prints out Log Messages if the bot is run in a debug build
+            // Only prints out Log Messages if the bot is run in a debug build, since log messages are useless in prod
             client.Log += (logMessage) =>
             {
                 Console.WriteLine(logMessage.Message);
@@ -87,6 +88,18 @@ namespace LuminateDiscordBot
             Console.WriteLine("Setup Complete");
 
             await Task.Delay(-1);
+        }
+
+        static IServiceProvider ConfigureServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddDbContext<DataContext>(options =>
+            {
+                options.UseSqlite($"Data Source={Constants.APP_ROOT}/database.db");
+            });
+
+            return services.BuildServiceProvider();
         }
 
     }

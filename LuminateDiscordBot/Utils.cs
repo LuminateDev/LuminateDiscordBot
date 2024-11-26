@@ -14,8 +14,8 @@ namespace LuminateDiscordBot
 
         public Task FileCheck()
         {
-            if (!Directory.Exists("LuminateConfig")) { CreateFiles(); }
-            if (!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
+            if (!Directory.Exists(Constants.APP_ROOT)) { CreateFiles(); }
+            if (!File.Exists($"{Constants.APP_ROOT}/config.json")) { CreateFiles(); }
             return Task.CompletedTask;
         }
 
@@ -23,8 +23,8 @@ namespace LuminateDiscordBot
 
         private Task CreateFiles()
         {
-            Directory.CreateDirectory("LuminateConfig");
-            using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
+            Directory.CreateDirectory(Constants.APP_ROOT);
+            using (StreamWriter sw = File.CreateText($"{Constants.APP_ROOT}/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
             return Task.CompletedTask;
         }
 

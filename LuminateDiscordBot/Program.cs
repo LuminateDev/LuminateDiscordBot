@@ -98,6 +98,7 @@ namespace LuminateDiscordBot
             {
                 options.UseSqlite($"Data Source={Constants.APP_ROOT}/database.db");
             });
+            services.AddSingleton<Utils>();
 
             return services.BuildServiceProvider();
         }

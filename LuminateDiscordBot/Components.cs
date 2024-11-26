@@ -9,6 +9,14 @@ namespace LuminateDiscordBot
     public class Components : InteractionModuleBase
     {
 
+        private readonly DataContext _dataContext;
+        private readonly Utils _utils;
+        public Components(DataContext context, Utils utils)
+        {
+            this._dataContext = context;
+            this._utils = utils;
+        }
+
         [ComponentInteraction("ticket-start")]
         public async Task HandleTicketMenu()
         {
@@ -23,7 +31,7 @@ namespace LuminateDiscordBot
                 embed.Color = Color.Blue;
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = Utils.SloganText
+                    Text = Constants.FOOTER_TEXT
                 };
 
                 ComponentBuilder components = new ComponentBuilder();
@@ -57,7 +65,7 @@ namespace LuminateDiscordBot
         public async Task HandleModal(string dataName, Models.TicketCreationModalModel modal)
         {
             TicketCategory? ticket = DBManager.GetTicketCategoryFromName(dataName);
-            ITextChannel channel = await Utils.CreateTicketChannel(this);
+            ITextChannel channel = await _utils.CreateTicketChannel(this);
 
             EmbedBuilder embed = new EmbedBuilder();
             embed.Color = Color.Blue;
@@ -65,7 +73,7 @@ namespace LuminateDiscordBot
             embed.Description = $"Your ticket has been created successfully!\nCheck <#{channel.Id}> to discuss your issue with Luminate Staff.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = Utils.SloganText
+                Text = Constants.FOOTER_TEXT
             };
 
             ComponentBuilder components = new ComponentBuilder();
@@ -73,7 +81,7 @@ namespace LuminateDiscordBot
 
 
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
-            await channel.SendMessageAsync($"<@&{Utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+            await channel.SendMessageAsync($"<@&{_utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
 
         }
 
@@ -81,7 +89,7 @@ namespace LuminateDiscordBot
         public async Task CloseTicket(string channelId)
         {
             SocketGuildUser user = (SocketGuildUser)Context.User;
-            bool hasRole = user.Roles.FirstOrDefault(x => x.Id == Utils.RoleConfig["ticket_role"]) != null;
+            bool hasRole = user.Roles.FirstOrDefault(x => x.Id == _utils.RoleConfig["ticket_role"]) != null;
 
             if (!hasRole)
             {
@@ -91,7 +99,7 @@ namespace LuminateDiscordBot
                 embed.Description = "You can not manually close a ticket, Team Luminate will handle this for you once your request is completed!";
                 embed.Footer = new EmbedFooterBuilder()
                 {
-                    Text = Utils.SloganText
+                    Text = Constants.FOOTER_TEXT
                 };
 
                 await RespondAsync("", new[] { embed.Build() }, ephemeral: true);

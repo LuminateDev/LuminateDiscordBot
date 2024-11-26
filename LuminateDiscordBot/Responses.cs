@@ -2,9 +2,9 @@
 
 namespace LuminateDiscordBot
 {
-    internal class Responses
+    public static class Responses
     {
-        public static Embed NoPermissions()
+        public static Embed NoPermissionsEmbed()
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Color = Color.Red;
@@ -12,12 +12,12 @@ namespace LuminateDiscordBot
             embed.Description = "It seems that you dont have the required permissions to access this command.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = Utils.SloganText
+                Text = Constants.FOOTER_TEXT
             };
             return embed.Build();
         }
 
-        public static Embed TicketInitMessage(string topic, string issue, ulong user)
+        public static Embed TicketInitMessageEmbed(string topic, string issue, ulong user)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Title = "Incoming Ticket!";

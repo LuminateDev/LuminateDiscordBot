@@ -81,7 +81,7 @@ namespace LuminateDiscordBot
 
 
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
-            await channel.SendMessageAsync($"<@&{_utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessage(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+            await channel.SendMessageAsync($"<@&{_utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessageEmbed(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
 
         }
 

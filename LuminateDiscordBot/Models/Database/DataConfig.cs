@@ -9,7 +9,7 @@ namespace LuminateDiscordBot.Models.Database
         [Key]
         [Column("config_id")]
         [Required]
-        public required string ConfigurationId { get; set; } = Guid.NewGuid().ToString("N");
+        public string ConfigurationId { get; set; } = Guid.NewGuid().ToString("N");
         [Column("data_name")] public required string DataName { get; set; }
         [Column("data_value")] public required ulong DataValue { get; set; }
         [Column("data_type")] public required DataTypes DataType { get; set; }

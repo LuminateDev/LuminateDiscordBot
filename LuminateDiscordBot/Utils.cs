@@ -28,13 +28,33 @@ namespace LuminateDiscordBot
             return Task.CompletedTask;
         }
 
+        public Task ReloadChannelConfig(List<Models.Database.DataConfig> data)
+        {
+            Dictionary<string, ulong> _config = new Dictionary<string, ulong>();
+            foreach(var entry in data)
+            {
+                _config.Add(entry.DataName, entry.DataValue);
+            }
+            ChannelConfig = _config;
+            return Task.CompletedTask;
+        }
 
+        public Task ReloadRoleConfig(List<Models.Database.DataConfig> data)
+        {
+            Dictionary<string, ulong> _config = new Dictionary<string, ulong>();
+            foreach(var entry in data)
+            {
+                _config.Add(entry.DataName, entry.DataValue);
+            }
+            RoleConfig = _config;
+            return Task.CompletedTask;
+        }
 
         public async Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
         {
-            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = this.ChannelConfig["ticket_category"]);
+            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = this.ChannelConfig[Constants.TICKET_CATEGORY_IDENTIFIER]);
             await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
-            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(this.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(this.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]), OverwritePermissions.AllowAll(channel));
             await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.InheritAll);
             return channel;
         }

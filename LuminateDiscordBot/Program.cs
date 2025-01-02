@@ -91,6 +91,9 @@ namespace LuminateDiscordBot
                 using (var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>())
                 {
                     dbContext.Database.EnsureCreated();
+
+                    await _utils.ReloadChannelConfig(dbContext.DataConfigs.Where(entry => entry.DataType == Models.Database.DataConfig.DataTypes.CHANNEL).ToList());
+                    await _utils.ReloadRoleConfig(dbContext.DataConfigs.Where(entry => entry.DataType == Models.Database.DataConfig.DataTypes.ROLE).ToList());
                 }
             }
             Console.WriteLine("Database Created.");
@@ -108,7 +111,7 @@ namespace LuminateDiscordBot
             {
                 options.UseSqlite($"Data Source={Constants.APP_ROOT}/database.db");
             });
-            services.AddSingleton<Utils>();
+            services.AddSingleton<Utils>(_utils);
 
             return services.BuildServiceProvider();
         }

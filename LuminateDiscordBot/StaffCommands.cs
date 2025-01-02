@@ -14,9 +14,11 @@ namespace LuminateDiscordBot
     public class StaffCommands : InteractionModuleBase
     {
         private readonly DataContext _dataContext;
-        public StaffCommands(DataContext dataContext)
+        private readonly Utils _utils;
+        public StaffCommands(DataContext dataContext, Utils utils)
         {
             this._dataContext = dataContext;
+            this._utils = utils;
         }
 
         [SlashCommand("echo", "Repeats a message as the bot")]
@@ -60,7 +62,7 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task InitTicketMessage()
         {
-            List<Objects.TicketCategory> tickets = _dataContext.TicketCategories.ToList();
+            List<Models.Database.TicketCategory> tickets = _dataContext.TicketCategories.ToList();
 
             SelectMenuBuilder menu = new SelectMenuBuilder();
 
@@ -96,7 +98,20 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task ModifyChannelRules([Summary("channel_identifier", "The internal Identifier you modify")] string channelIdentifier, [ChannelTypes(Discord.ChannelType.Text, Discord.ChannelType.Voice, Discord.ChannelType.Category)] IChannel targetChannel)
         {
-            DBManager.ModifyChannelConfig(channelIdentifier, targetChannel.Id);
+            var configEntry = _dataContext.DataConfigs.FirstOrDefault(entry => entry.DataType == Models.Database.DataConfig.DataTypes.CHANNEL && entry.DataName == channelIdentifier);
+            if (configEntry != null)
+            {
+                configEntry.DataValue = targetChannel.Id;
+            } else
+            {
+                var entry = new Models.Database.DataConfig()
+                {
+                    DataName = channelIdentifier,
+                    DataType = Models.Database.DataConfig.DataTypes.CHANNEL,
+                    DataValue = targetChannel.Id
+                };
+                _dataContext.DataConfigs.Add(entry);
+            }
             EmbedBuilder embed = new EmbedBuilder();
             embed.Title = "Updated!";
             embed.Description = "You have successfully updated the Channel Config.";
@@ -106,6 +121,9 @@ namespace LuminateDiscordBot
                 Text = Constants.FOOTER_TEXT
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+            await _dataContext.SaveChangesAsync();
+
+            await _utils.ReloadChannelConfig(_dataContext.DataConfigs.Where(entry => entry.DataType == Models.Database.DataConfig.DataTypes.CHANNEL).ToList());
         }
 
         [SlashCommand("set-role-rule", "Adds or updates the role config")]

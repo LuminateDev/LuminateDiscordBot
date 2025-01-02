@@ -22,8 +22,7 @@ namespace LuminateDiscordBot
             Console.WriteLine("Starting Bot...");
             await _utils.FileCheck();
             var config = _utils.GetConfig();
-            DBManager.InitDB();
-            DBManager.UpdateInternalChannelConfigs();
+            
             if (config.BotToken == "") { Console.WriteLine("Please setup the config."); Console.ReadKey(); Environment.Exit(0); }
 
             DiscordSocketConfig socketConfig = new DiscordSocketConfig()
@@ -84,6 +83,17 @@ namespace LuminateDiscordBot
 #endif
 
             // Events end here
+
+
+            Console.WriteLine("Creating Database...");
+            using (var scope = _services!.CreateScope())
+            {
+                using (var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>())
+                {
+                    dbContext.Database.EnsureCreated();
+                }
+            }
+            Console.WriteLine("Database Created.");
 
             Console.WriteLine("Setup Complete");
 

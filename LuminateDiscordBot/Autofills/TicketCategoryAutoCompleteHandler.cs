@@ -15,7 +15,7 @@ namespace LuminateDiscordBot.Autofills
     {
         public class TicketAutoCompleteLoader : AutocompleteHandler
         {
-            public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autoCompletInteraction, IParameterInfo parameter, IServiceProvider services)
+            public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autoCompletInteraction, IParameterInfo parameter, IServiceProvider services)
             {
                 List<AutocompleteResult> results = new List<AutocompleteResult>();
 
@@ -34,9 +34,8 @@ namespace LuminateDiscordBot.Autofills
                     }
                 }
 
-                return AutocompletionResult.FromSuccess(results.Take(25));
+                return Task.FromResult(AutocompletionResult.FromSuccess(results.Take(25)));
             }
         }
     }
 }
-#pragma warning enable

@@ -131,7 +131,20 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task ModifyRoleRules([Summary("role_identifier", "The internal Identifier you modify")] string roleIdentifier, IRole targetRole)
         {
-            DBManager.ModifyRoleConfig(roleIdentifier, targetRole.Id);
+            var roleEntry = _dataContext.DataConfigs.FirstOrDefault(entry => entry.DataType == Models.Database.DataConfig.DataTypes.ROLE && entry.DataName == roleIdentifier);
+            if (roleEntry != null)
+            {
+                roleEntry.DataValue = targetRole.Id;
+            } else
+            {
+                var entry = new Models.Database.DataConfig()
+                {
+                    DataName = roleIdentifier,
+                    DataType = Models.Database.DataConfig.DataTypes.ROLE,
+                    DataValue = targetRole.Id
+                };
+                _dataContext.DataConfigs.Add(entry);
+            }
             EmbedBuilder embed = new EmbedBuilder();
             embed.Title = "Updated!";
             embed.Description = "You have successfully updated the Role Config.";
@@ -141,6 +154,8 @@ namespace LuminateDiscordBot
                 Text = Constants.FOOTER_TEXT
             };
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+            await _dataContext.SaveChangesAsync();
+            await _utils.ReloadRoleConfig(_dataContext.DataConfigs.Where(entry => entry.DataType == Models.Database.DataConfig.DataTypes.ROLE).ToList());
         }
 
         [SlashCommand("echo-attachment", "Repeats a message from file content")]

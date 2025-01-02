@@ -112,5 +112,12 @@ namespace LuminateDiscordBot
 
         }
 
+
+        [ModalInteraction("ticket-category-modification:*")]
+        public async Task ModifyTicketCategoryAsync(string categoryId, Models.TicketManagementModalModel modal)
+        {
+
+        }
+
     }
 }

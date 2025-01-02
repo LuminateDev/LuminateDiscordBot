@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -19,18 +20,26 @@ namespace LuminateDiscordBot.Autofills
             {
                 List<AutocompleteResult> results = new List<AutocompleteResult>();
 
-                List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
-
-                foreach (var ticket in tickets)
+                using (var scope = services.CreateScope())
                 {
-                    string lookupcontext = $"{JsonSerializer.Serialize(ticket)}";
-                    if (!String.IsNullOrEmpty(autoCompletInteraction.Data.Current.Value.ToString()))
+                    using (var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>())
                     {
-                        if (lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString().ToLower())) { results.Add(new AutocompleteResult(ticket.TicketTopic, ticket.TicketDataName)); }
-                    }
-                    else
-                    {
-                        results.Add(new AutocompleteResult(ticket.TicketTopic, ticket.TicketDataName));
+                        List<Models.Database.TicketCategory> tickets = dataContext.TicketCategories.ToList();
+
+                        foreach (var ticket in tickets)
+                        {
+                            string lookupcontext = JsonSerializer.Serialize(ticket);
+                            if (!String.IsNullOrEmpty(autoCompletInteraction.Data.Current.Value.ToString()))
+                            {
+                                if (lookupcontext.ToLower().Contains(autoCompletInteraction.Data.Current.Value.ToString()!.ToLower())) { results.Add(new AutocompleteResult(ticket.CategoryId, $"{ticket.TicketDataName} | Autoresponse: {ticket.AutoResponseEnabled}")); }
+                            }
+                            else
+                            {
+                                results.Add(new AutocompleteResult(ticket.CategoryId, $"{ticket.TicketDataName} | Autoresponse: {ticket.AutoResponseEnabled}"));
+                            }
+                        }
+                        results = results.Take(24).ToList();
+                        results.Add(new AutocompleteResult(Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY, $"[{Constants.PLUS_SIGN}] Add new"));
                     }
                 }
 

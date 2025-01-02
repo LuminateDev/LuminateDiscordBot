@@ -25,6 +25,5 @@ namespace LuminateDiscordBot.Models
         [InputLabel("Ticket Topic Auto-Response")]
         [ModalTextInput("autoresponse", Discord.TextInputStyle.Paragraph, "If filled out, it will not create tickets and rather respond with the given text")]
         public string? TopicAutoResponse { get; set; } = null;
-
     }
 }

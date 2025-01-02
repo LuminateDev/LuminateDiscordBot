@@ -3,6 +3,7 @@ using Discord.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -203,8 +204,26 @@ namespace LuminateDiscordBot
 
         [SlashCommand("modify-ticket-category", "Allows you to create or modify a ticket category")]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        public async Task ModifyOrCreateTicketCategory([Summary("category-id", ), Autocomplete(typeof())])
+        public async Task ModifyOrCreateTicketCategory([Summary("category-id", "The Ticket category you want to modify"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler))] string ticketCategoryId)
         {
+            if(ticketCategoryId == Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY)
+            {
+                await RespondWithModalAsync<Models.TicketManagementModalModel>($"ticket-category-modification:{Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY}");
+                return;
+            }
+            var targetEntry = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == ticketCategoryId);
+            if(targetEntry != null)
+            {
+                Models.TicketManagementModalModel modal = new()
+                {
+                    TopicAutoResponse = targetEntry.TicketDataAutoResponse,
+                    TopicName = targetEntry.TicketDataName,
+                    TopicKeywords = targetEntry.CategoryAliases
+                };
+                await RespondWithModalAsync<Models.TicketManagementModalModel>($"ticket-category-modification:{targetEntry.CategoryId}", modal);
+            }
+
+
         }
 
     }

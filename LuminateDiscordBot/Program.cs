@@ -67,7 +67,7 @@ namespace LuminateDiscordBot
                 };
                 try
                 {
-                    await guildUser.Guild.GetTextChannel(_utils.ChannelConfig["welcome_channel"]).SendMessageAsync("", false, embed.Build());
+                    await guildUser.Guild.GetTextChannel(_utils.ChannelConfig[Constants.WELCOME_CHANNEL_IDENTIFIER]).SendMessageAsync("", false, embed.Build());
                 }
                 catch (Exception e) { await Console.Out.WriteLineAsync(e.Message); }
 

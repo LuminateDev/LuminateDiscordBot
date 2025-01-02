@@ -81,7 +81,7 @@ namespace LuminateDiscordBot
 
 
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
-            await channel.SendMessageAsync($"<@&{_utils.RoleConfig["ticket_role"]}>", false, Responses.TicketInitMessageEmbed(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+            await channel.SendMessageAsync($"<@&{_utils.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]}>", false, Responses.TicketInitMessageEmbed(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
 
         }
 
@@ -89,7 +89,7 @@ namespace LuminateDiscordBot
         public async Task CloseTicket(string channelId)
         {
             SocketGuildUser user = (SocketGuildUser)Context.User;
-            bool hasRole = user.Roles.FirstOrDefault(x => x.Id == _utils.RoleConfig["ticket_role"]) != null;
+            bool hasRole = user.Roles.FirstOrDefault(x => x.Id == _utils.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]) != null;
 
             if (!hasRole)
             {

@@ -11,7 +11,7 @@ namespace LuminateDiscordBot
     [Group("staff", "Contains all staff commands")]
     [RequireUserPermission(Discord.GuildPermission.BanMembers)]
     [CommandContextType(Discord.InteractionContextType.Guild)]
-    public class StaffCommands :InteractionModuleBase
+    public class StaffCommands : InteractionModuleBase
     {
         private readonly DataContext _dataContext;
         public StaffCommands(DataContext dataContext)
@@ -60,7 +60,7 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task InitTicketMessage()
         {
-            List<Objects.TicketCategory> tickets = DBManager.GetTicketCategories();
+            List<Objects.TicketCategory> tickets = _dataContext.TicketCategories.ToList();
 
             SelectMenuBuilder menu = new SelectMenuBuilder();
 
@@ -166,6 +166,12 @@ namespace LuminateDiscordBot
                 catch (Exception e) { Console.WriteLine(e); }
 
             }
+        }
+
+        [SlashCommand("modify-ticket-category", "Allows you to create or modify a ticket category")]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
+        public async Task ModifyOrCreateTicketCategory([Summary("category-id", ), Autocomplete(typeof())])
+        {
         }
 
     }

@@ -227,8 +227,31 @@ namespace LuminateDiscordBot
             }
 
             await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral:true);
+        }
 
+        [SlashCommand("delete-ticket-category", "Allows you to delete a ticket category")]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
+        public async Task DeleteTicketCategoryCommand([Summary("category-id", "The Ticket category you want to delete"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler))] string categoryId)
+        {
+            var targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == categoryId);
+            if(targetCategory == null)
+            {
+                await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral: true);
+                return;
+            }
 
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Color = Color.Blue;
+            embed.Title = "Category Removed!";
+            embed.Description = $"Successfully removed Category with ID **{targetCategory.CategoryId}** from the database!";
+            embed.Footer = new()
+            {
+                Text = Constants.FOOTER_TEXT
+            };
+            embed.Timestamp = DateTime.Now;
+            await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+            _dataContext.TicketCategories.Remove(targetCategory);
+            await _dataContext.SaveChangesAsync();
         }
 
     }

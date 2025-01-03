@@ -6,44 +6,55 @@ using System.Text.Json;
 
 namespace LuminateDiscordBot
 {
-    internal class Utils
+    public class Utils
     {
-        public static Objects.Config? Config;
 
-        public const string SloganText = "Luminate - Your ideas shine bright";
+        public Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
+        public Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();
 
-        public static Dictionary<string, ulong> ChannelConfig = new Dictionary<string, ulong>();
-        public static Dictionary<string, ulong> RoleConfig = new Dictionary<string, ulong>();
-
-        public static void FileCheck()
+        public Task FileCheck()
         {
-            if (!Directory.Exists("LuminateConfig")) { CreateFiles(); }
-            if (!File.Exists("LuminateConfig/config.json")) { CreateFiles(); }
+            if (!Directory.Exists(Constants.APP_ROOT)) { CreateFiles(); }
+            if (!File.Exists($"{Constants.APP_ROOT}/config.json")) { CreateFiles(); }
+            return Task.CompletedTask;
         }
 
-        public static void ReadFiles()
+        public Objects.Config GetConfig() => JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText($"{Constants.APP_ROOT}/config.json"))!;
+
+        private Task CreateFiles()
         {
-            Config = JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText("LuminateConfig/config.json"));
+            Directory.CreateDirectory(Constants.APP_ROOT);
+            using (StreamWriter sw = File.CreateText($"{Constants.APP_ROOT}/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
+            return Task.CompletedTask;
         }
 
-        static void CreateFiles()
+        public Task ReloadChannelConfig(List<Models.Database.DataConfig> data)
         {
-            Directory.CreateDirectory("LuminateConfig");
-            using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(new Objects.Config(), new JsonSerializerOptions { WriteIndented = true })); }
+            Dictionary<string, ulong> _config = new Dictionary<string, ulong>();
+            foreach(var entry in data)
+            {
+                _config.Add(entry.DataName, entry.DataValue);
+            }
+            ChannelConfig = _config;
+            return Task.CompletedTask;
         }
 
-        static void WriteConfig()
+        public Task ReloadRoleConfig(List<Models.Database.DataConfig> data)
         {
-            using (StreamWriter sw = File.CreateText("LuminateConfig/config.json")) { sw.Write(JsonSerializer.Serialize(Config), new JsonSerializerOptions() { WriteIndented = true }); }
+            Dictionary<string, ulong> _config = new Dictionary<string, ulong>();
+            foreach(var entry in data)
+            {
+                _config.Add(entry.DataName, entry.DataValue);
+            }
+            RoleConfig = _config;
+            return Task.CompletedTask;
         }
 
-
-
-        public async static Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
+        public async Task<ITextChannel> CreateTicketChannel(InteractionModuleBase interaction)
         {
-            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = Utils.ChannelConfig["ticket_category"]);
+            ITextChannel channel = await interaction.Context.Guild.CreateTextChannelAsync(Guid.NewGuid().ToString(), c => c.CategoryId = this.ChannelConfig[Constants.TICKET_CATEGORY_IDENTIFIER]);
             await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
-            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(Utils.RoleConfig["ticket_role"]), OverwritePermissions.AllowAll(channel));
+            await channel.AddPermissionOverwriteAsync(interaction.Context.Guild.GetRole(this.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]), OverwritePermissions.AllowAll(channel));
             await channel.AddPermissionOverwriteAsync(interaction.Context.User, OverwritePermissions.InheritAll);
             return channel;
         }

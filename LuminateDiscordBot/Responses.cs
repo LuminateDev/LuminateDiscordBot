@@ -1,10 +1,11 @@
 ﻿using Discord;
+using Discord.Rest;
 
 namespace LuminateDiscordBot
 {
-    internal class Responses
+    public static class Responses
     {
-        public static Embed NoPermissions()
+        public static Embed NoPermissionsEmbed()
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Color = Color.Red;
@@ -12,12 +13,14 @@ namespace LuminateDiscordBot
             embed.Description = "It seems that you dont have the required permissions to access this command.";
             embed.Footer = new EmbedFooterBuilder()
             {
-                Text = Utils.SloganText
+                Text = Constants.FOOTER_TEXT
             };
+            embed.Timestamp = DateTime.Now;
             return embed.Build();
+
         }
 
-        public static Embed TicketInitMessage(string topic, string issue, ulong user)
+        public static Embed TicketInitMessageEmbed(string topic, string issue, ulong user)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.Title = "Incoming Ticket!";
@@ -26,6 +29,20 @@ namespace LuminateDiscordBot
             embed.AddField("Topic", topic);
             embed.AddField("Issue", issue);
             embed.AddField("Ticket Author", $"<@{user}>");
+            return embed.Build();
+        }
+
+        public static Embed InvalidActionEmbed()
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Color = Color.Red;
+            embed.Title = "Invalid Action";
+            embed.Description = "The action you are trying to perform is invalid, please try again!";
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = Constants.FOOTER_TEXT
+            };
+            embed.Timestamp = DateTime.Now;
             return embed.Build();
         }
     }

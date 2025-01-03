@@ -20,16 +20,20 @@ namespace LuminateDiscordBot
         }
 
         [ComponentInteraction("ticket-start")]
-        public async Task HandleTicketMenu()
+        public async Task HandleTicketMenu(string selection)
         {
-            IComponentInteraction interaction = (IComponentInteraction)Context.Interaction;
 
-            TicketCategory? ticket = DBManager.GetTicketCategoryFromName(interaction.Data.Values.First());
-            if (ticket?.TicketDataAutoResponse != null)
+            Models.Database.TicketCategory? targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == selection);
+            if(targetCategory == null)
+            {
+                await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral: true);
+                return;
+            }
+            if (targetCategory.AutoResponseEnabled)
             {
                 EmbedBuilder embed = new EmbedBuilder();
-                embed.Title = "Attention.";
-                embed.Description = ticket.TicketDataAutoResponse;
+                embed.Title = "Attention";
+                embed.Description = targetCategory.TicketDataAutoResponse;
                 embed.Color = Color.Blue;
                 embed.Footer = new EmbedFooterBuilder()
                 {
@@ -37,14 +41,14 @@ namespace LuminateDiscordBot
                 };
 
                 ComponentBuilder components = new ComponentBuilder();
-                components.WithButton("Open a ticket anyways", $"ticket-force:{ticket.TicketDataName}", ButtonStyle.Success);
+                components.WithButton("Open a ticket anyways", $"ticket-force:{targetCategory.CategoryId}", ButtonStyle.Success);
                 components.WithButton("Dismiss", "ticket-dismiss", ButtonStyle.Danger);
 
                 await RespondAsync("", new[] { embed.Build() }, ephemeral: true, components: components.Build());
                 return;
             }
 
-            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{ticket?.TicketDataName}");
+            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{targetCategory.CategoryId}");
 
 
         }

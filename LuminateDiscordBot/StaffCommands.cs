@@ -63,14 +63,15 @@ namespace LuminateDiscordBot
         [CommandContextType(InteractionContextType.Guild)]
         public async Task InitTicketMessage()
         {
-            List<Models.Database.TicketCategory> tickets = _dataContext.TicketCategories.ToList();
+            List<Models.Database.TicketCategory> tickets = _dataContext.TicketCategories.Take(25).ToList();
 
             SelectMenuBuilder menu = new SelectMenuBuilder();
 
             foreach (var ticket in tickets)
             {
-                menu.AddOption(ticket.TicketTopic, ticket.TicketDataName);
+                menu.AddOption(ticket.TicketTopic, ticket.CategoryId, ticket.TicketDataDescription);
             }
+            
             menu.Type = ComponentType.SelectMenu;
             menu.MaxValues = 1;
             menu.WithCustomId("ticket-start");

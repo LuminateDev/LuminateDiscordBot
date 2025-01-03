@@ -65,6 +65,7 @@ namespace LuminateDiscordBot
                 {
                     Text = Constants.FOOTER_TEXT
                 };
+                embed.Timestamp = DateTime.Now;
                 try
                 {
                     await guildUser.Guild.GetTextChannel(_utils.ChannelConfig[Constants.WELCOME_CHANNEL_IDENTIFIER]).SendMessageAsync("", false, embed.Build());

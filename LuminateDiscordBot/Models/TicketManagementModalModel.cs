@@ -17,6 +17,12 @@ namespace LuminateDiscordBot.Models
         public required string TopicName { get; set; }
 
         [RequiredInput(true)]
+        [InputLabel("Ticket Topic Description")]
+        [ModalTextInput("description", Discord.TextInputStyle.Short, "A brief description of the topic")]
+        public required string TopicDescription { get; set; }
+
+
+        [RequiredInput(true)]
         [InputLabel("Ticket Topic Keywords")]
         [ModalTextInput("keywords", Discord.TextInputStyle.Short, "Enter one or more keywords, seperated by comma")]
         public required string TopicKeywords { get; set; }

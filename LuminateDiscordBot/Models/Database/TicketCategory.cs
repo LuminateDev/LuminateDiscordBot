@@ -19,7 +19,7 @@ namespace LuminateDiscordBot.Models.Database
         [Column("category_aliases")]public required string CategoryAliases { get; set; }
         [Column("ticket_data_name")]public required string TicketDataName { get; set; }
         [Column("ticket_data_description")]public required string TicketDataDescription { get; set; }
-        [Column("ticket_data_auto_response")]public required string TicketDataAutoResponse { get; set; }
+        [Column("ticket_data_auto_response")]public string? TicketDataAutoResponse { get; set; }
         [Column("auto_response_enabled")] public required bool AutoResponseEnabled { get; set; }
     }
 }

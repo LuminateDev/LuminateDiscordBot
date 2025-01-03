@@ -218,10 +218,14 @@ namespace LuminateDiscordBot
                 {
                     TopicAutoResponse = targetEntry.TicketDataAutoResponse,
                     TopicName = targetEntry.TicketDataName,
-                    TopicKeywords = targetEntry.CategoryAliases
+                    TopicKeywords = targetEntry.CategoryAliases,
+                    TopicDescription = targetEntry.TicketDataDescription,
                 };
                 await RespondWithModalAsync<Models.TicketManagementModalModel>($"ticket-category-modification:{targetEntry.CategoryId}", modal);
+                return;
             }
+
+            await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral:true);
 
 
         }

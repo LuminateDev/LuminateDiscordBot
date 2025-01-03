@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Rest;
 
 namespace LuminateDiscordBot
 {
@@ -14,7 +15,9 @@ namespace LuminateDiscordBot
             {
                 Text = Constants.FOOTER_TEXT
             };
+            embed.Timestamp = DateTime.Now;
             return embed.Build();
+
         }
 
         public static Embed TicketInitMessageEmbed(string topic, string issue, ulong user)
@@ -26,6 +29,20 @@ namespace LuminateDiscordBot
             embed.AddField("Topic", topic);
             embed.AddField("Issue", issue);
             embed.AddField("Ticket Author", $"<@{user}>");
+            return embed.Build();
+        }
+
+        public static Embed InvalidActionEmbed()
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Color = Color.Red;
+            embed.Title = "Invalid Action";
+            embed.Description = "The action you are trying to perform is invalid, please try again!";
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = Constants.FOOTER_TEXT
+            };
+            embed.Timestamp = DateTime.Now;
             return embed.Build();
         }
     }

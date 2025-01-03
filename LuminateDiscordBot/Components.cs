@@ -3,6 +3,8 @@ using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
 using LuminateDiscordBot.Objects;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Runtime.InteropServices;
 
 namespace LuminateDiscordBot
 {
@@ -114,9 +116,54 @@ namespace LuminateDiscordBot
 
 
         [ModalInteraction("ticket-category-modification:*")]
-        public async Task ModifyTicketCategoryAsync(string categoryId, Models.TicketManagementModalModel modal)
+        public async Task ModifyTicketCategoryModal(string categoryId, Models.TicketManagementModalModel modal)
         {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Color = Color.Blue;
+            embed.Timestamp = DateTime.Now;
+            embed.Footer = new EmbedFooterBuilder()
+            {
+                Text = Constants.FOOTER_TEXT
+            };
 
+            if (categoryId == Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY)
+            {
+
+                Models.Database.TicketCategory newCategory = new Models.Database.TicketCategory()
+                {
+                    TicketTopic = modal.TopicName,
+                    TicketDataName = modal.TopicName,
+                    CategoryAliases = modal.TopicKeywords,
+                    AutoResponseEnabled = !string.IsNullOrEmpty(modal.TopicAutoResponse),
+                    TicketDataAutoResponse = modal.TopicAutoResponse,
+                    TicketDataDescription = modal.TopicDescription,
+                };
+                
+                embed.Title = "Ticket Category added!";
+                embed.Description = $"Successfully added **{modal.TopicName}** ({newCategory.CategoryId}) as a Ticket Category.";
+                await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
+                await _dataContext.SaveChangesAsync();
+                return;
+            }
+
+            var targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == categoryId);
+            if (targetCategory == null)
+            {
+                await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral: true);
+                return;
+            }
+
+            targetCategory.TicketTopic = modal.TopicName;
+            targetCategory.TicketDataName = modal.TopicName;
+            targetCategory.CategoryAliases = modal.TopicKeywords;
+            targetCategory.AutoResponseEnabled = !string.IsNullOrEmpty(modal.TopicAutoResponse);
+            targetCategory.TicketDataAutoResponse = modal.TopicAutoResponse;
+            targetCategory.TicketDataDescription = modal.TopicDescription;
+
+            embed.Title = "Ticket Category modified!";
+            embed.Description = $"Successfully modified **{modal.TopicName}** ({targetCategory.CategoryId}).";
+            await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
+            await _dataContext.SaveChangesAsync();
         }
 
     }

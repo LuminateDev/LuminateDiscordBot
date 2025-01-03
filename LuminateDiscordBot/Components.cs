@@ -150,6 +150,7 @@ namespace LuminateDiscordBot
                 embed.Title = "Ticket Category added!";
                 embed.Description = $"Successfully added **{modal.TopicName}** ({newCategory.CategoryId}) as a Ticket Category.";
                 await RespondAsync("", new[] { embed.Build() }, ephemeral:true);
+                await _dataContext.TicketCategories.AddAsync(newCategory);
                 await _dataContext.SaveChangesAsync();
                 return;
             }

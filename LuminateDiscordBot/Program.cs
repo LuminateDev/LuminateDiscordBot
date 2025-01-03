@@ -10,7 +10,7 @@ namespace LuminateDiscordBot
 {
     internal class Program
     {
-        public static ServiceProvider? _services = null;
+        public static IServiceProvider? _services = null;
         public static InteractionService? _interactionService;
         public static DiscordSocketClient? client;
 
@@ -36,6 +36,7 @@ namespace LuminateDiscordBot
             await client.LoginAsync(TokenType.Bot, config.BotToken);
             await client.StartAsync();
             _interactionService = new InteractionService(client.Rest);
+            _services = ConfigureServices();
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
             // Events

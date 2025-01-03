@@ -19,7 +19,7 @@ namespace LuminateDiscordBot
             return Task.CompletedTask;
         }
 
-        public Objects.Config GetConfig() => JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText("LuminateConfig/config.json"))!;
+        public Objects.Config GetConfig() => JsonSerializer.Deserialize<Objects.Config>(File.ReadAllText($"{Constants.APP_ROOT}/config.json"))!;
 
         private Task CreateFiles()
         {

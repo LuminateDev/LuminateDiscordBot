@@ -1,11 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuminateDiscordBot
 {
@@ -205,7 +199,7 @@ namespace LuminateDiscordBot
 
         [SlashCommand("modify-ticket-category", "Allows you to create or modify a ticket category")]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        public async Task ModifyOrCreateTicketCategory([Summary("category-id", "The Ticket category you want to modify"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler))] string ticketCategoryId)
+        public async Task ModifyOrCreateTicketCategory([Summary("category-id", "The Ticket category you want to modify"), Autocomplete(typeof(Autofills.TicketAutoCompleteLoader))] string ticketCategoryId)
         {
             if(ticketCategoryId == Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY)
             {
@@ -231,7 +225,7 @@ namespace LuminateDiscordBot
 
         [SlashCommand("delete-ticket-category", "Allows you to delete a ticket category")]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        public async Task DeleteTicketCategoryCommand([Summary("category-id", "The Ticket category you want to delete"), Autocomplete(typeof(Autofills.TicketCategoryAutoCompleteHandler))] string categoryId)
+        public async Task DeleteTicketCategoryCommand([Summary("category-id", "The Ticket category you want to delete"), Autocomplete(typeof(Autofills.TicketAutoCompleteLoader))] string categoryId)
         {
             var targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == categoryId);
             if(targetCategory == null)

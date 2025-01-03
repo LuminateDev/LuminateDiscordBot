@@ -62,21 +62,25 @@ namespace LuminateDiscordBot
         }
 
         [ComponentInteraction("ticket-force:*")]
-        public async Task HandleTicketForce(string dataName)
+        public async Task HandleTicketForce(string categoryId)
         {
-            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{dataName}");
+            await RespondWithModalAsync<Models.TicketCreationModalModel>($"ticket-modal:{categoryId}");
         }
 
         [ModalInteraction("ticket-modal:*")]
-        public async Task HandleModal(string dataName, Models.TicketCreationModalModel modal)
+        public async Task HandleModal(string categoryId, Models.TicketCreationModalModel modal)
         {
-            TicketCategory? ticket = DBManager.GetTicketCategoryFromName(dataName);
+            Models.Database.TicketCategory? targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == categoryId);
+            if(targetCategory == null)
+            {
+                await RespondAsync("", new[] { Responses.InvalidActionEmbed() }, ephemeral: true);
+                return;
+            }
             ITextChannel channel = await _utils.CreateTicketChannel(this);
-
             EmbedBuilder embed = new EmbedBuilder();
             embed.Color = Color.Blue;
             embed.Title = "Ticket created!";
-            embed.Description = $"Your ticket has been created successfully!\nCheck <#{channel.Id}> to discuss your issue with Luminate Staff.";
+            embed.Description = $"Your ticket has been created successfully!\nCheck {channel.Mention} to discuss your issue with Luminate Staff.";
             embed.Footer = new EmbedFooterBuilder()
             {
                 Text = Constants.FOOTER_TEXT
@@ -87,7 +91,7 @@ namespace LuminateDiscordBot
 
 
             await RespondAsync("", new[] { embed.Build() }, ephemeral: true);
-            await channel.SendMessageAsync($"<@&{_utils.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]}>", false, Responses.TicketInitMessageEmbed(ticket!.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
+            await channel.SendMessageAsync($"<@&{_utils.RoleConfig[Constants.TICKET_ROLE_IDENTIFIER]}>", false, Responses.TicketInitMessageEmbed(targetCategory.TicketTopic, modal.Reason, Context.Interaction.User.Id), components: components.Build());
 
         }
 

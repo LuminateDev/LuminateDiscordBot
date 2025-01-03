@@ -5,6 +5,7 @@ namespace LuminateDiscordBot
 {
     [Group("staff", "Contains all staff commands")]
     [RequireUserPermission(Discord.GuildPermission.BanMembers)]
+    [DefaultMemberPermissions(GuildPermission.BanMembers)]
     [CommandContextType(Discord.InteractionContextType.Guild)]
     public class StaffCommands : InteractionModuleBase
     {
@@ -54,7 +55,6 @@ namespace LuminateDiscordBot
 
         [SlashCommand("init-tickets", "Initializes the ticket Select Menu")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [CommandContextType(InteractionContextType.Guild)]
         public async Task InitTicketMessage()
         {
             List<Models.Database.TicketCategory> tickets = _dataContext.TicketCategories.Take(25).ToList();
@@ -91,7 +91,6 @@ namespace LuminateDiscordBot
 
         [SlashCommand("set-channel-rule", "Adds or updates the channel config")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [CommandContextType(InteractionContextType.Guild)]
         public async Task ModifyChannelRules([Summary("channel_identifier", "The internal Identifier you modify")] string channelIdentifier, [ChannelTypes(Discord.ChannelType.Text, Discord.ChannelType.Voice, Discord.ChannelType.Category)] IChannel targetChannel)
         {
             var configEntry = _dataContext.DataConfigs.FirstOrDefault(entry => entry.DataType == Models.Database.DataConfig.DataTypes.CHANNEL && entry.DataName == channelIdentifier);
@@ -124,7 +123,6 @@ namespace LuminateDiscordBot
 
         [SlashCommand("set-role-rule", "Adds or updates the role config")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [CommandContextType(InteractionContextType.Guild)]
         public async Task ModifyRoleRules([Summary("role_identifier", "The internal Identifier you modify")] string roleIdentifier, IRole targetRole)
         {
             var roleEntry = _dataContext.DataConfigs.FirstOrDefault(entry => entry.DataType == Models.Database.DataConfig.DataTypes.ROLE && entry.DataName == roleIdentifier);
@@ -156,7 +154,6 @@ namespace LuminateDiscordBot
 
         [SlashCommand("echo-attachment", "Repeats a message from file content")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [CommandContextType(InteractionContextType.Guild)]
         public async Task EchoMessageFromFile(IAttachment file, bool asEmbed = false, string? embedTitle = null)
         {
 
@@ -198,7 +195,7 @@ namespace LuminateDiscordBot
         }
 
         [SlashCommand("modify-ticket-category", "Allows you to create or modify a ticket category")]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ModifyOrCreateTicketCategory([Summary("category-id", "The Ticket category you want to modify"), Autocomplete(typeof(Autofills.TicketAutoCompleteLoader))] string ticketCategoryId)
         {
             if(ticketCategoryId == Constants.TICKET_CATEGORY_AUTOCOMPLETE_ADD_KEY)
@@ -224,7 +221,7 @@ namespace LuminateDiscordBot
         }
 
         [SlashCommand("delete-ticket-category", "Allows you to delete a ticket category")]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task DeleteTicketCategoryCommand([Summary("category-id", "The Ticket category you want to delete"), Autocomplete(typeof(Autofills.TicketAutoCompleteLoader))] string categoryId)
         {
             var targetCategory = _dataContext.TicketCategories.FirstOrDefault(entry => entry.CategoryId == categoryId);
